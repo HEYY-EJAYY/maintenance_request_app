@@ -168,7 +168,9 @@ export default function MaintenanceApp() {
 
   // Admin Dashboard
   if (currentPage === "admin-dashboard") {
-    return <AdminDashboard onNavigate={(tab) => console.log("Navigate to:", tab)} />;
+    return (
+      <AdminDashboard onNavigate={(tab) => console.log("Navigate to:", tab)} />
+    );
   }
 
   return null;
