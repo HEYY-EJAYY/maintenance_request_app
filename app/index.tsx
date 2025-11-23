@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Image,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -71,7 +72,11 @@ export default function MaintenanceApp() {
           </View>
 
           {/* Hero Banner */}
-          <View style={styles.heroBanner}>
+          <ImageBackground
+            source={require("../assets/images/camella.jpeg")}
+            style={styles.heroBanner}
+            resizeMode="cover"
+          >
             <View style={styles.bannerOverlay} />
             <View style={styles.bannerContent}>
               <Text style={styles.bannerTitle}>
@@ -86,7 +91,7 @@ export default function MaintenanceApp() {
                 style={styles.submitButton}
               />
             </View>
-          </View>
+          </ImageBackground>
 
           {/* Active Requests Section */}
           <View style={styles.activeRequestsHeader}>
