@@ -58,7 +58,14 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
 
         <View style={styles.signupCard}>
           <View style={styles.welcomeBox}>
-            <Text style={styles.welcomeText}>Create Account</Text>
+            <Text
+              style={[
+                styles.welcomeText,
+                activeTab === "admin" && styles.welcomeTextAdmin,
+              ]}
+            >
+              Create Account
+            </Text>
             <Text style={styles.welcomeSubtext}>Sign up to get started</Text>
           </View>
 
@@ -80,7 +87,10 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.tab, activeTab === "admin" && styles.tabActive]}
+              style={[
+                styles.tab,
+                activeTab === "admin" && styles.tabActiveAdmin,
+              ]}
               onPress={() => setActiveTab("admin")}
             >
               <Text
@@ -145,14 +155,21 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Button
               title="Sign Up"
               onPress={handleSignUp}
-              variant="accent"
+              variant={activeTab === "admin" ? "primary" : "accent"}
               style={styles.signupButton}
             />
 
             <View style={styles.loginTextContainer}>
               <Text style={styles.loginText}>Already have an account? </Text>
               <TouchableOpacity onPress={onBackToLogin}>
-                <Text style={styles.loginLink}>Log In</Text>
+                <Text
+                  style={[
+                    styles.loginLink,
+                    activeTab === "admin" && styles.loginLinkAdmin,
+                  ]}
+                >
+                  Log In
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -220,6 +237,9 @@ const styles = StyleSheet.create({
     color: colors.accent,
     marginBottom: 4,
   },
+  welcomeTextAdmin: {
+    color: colors.primary,
+  },
   welcomeSubtext: {
     fontSize: 14,
     color: colors.text.secondary,
@@ -242,6 +262,10 @@ const styles = StyleSheet.create({
   tabActive: {
     backgroundColor: colors.accent,
     borderColor: colors.accent,
+  },
+  tabActiveAdmin: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   tabText: {
     fontSize: 14,
@@ -271,5 +295,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.accent,
     fontWeight: "600",
+  },
+  loginLinkAdmin: {
+    color: colors.primary,
   },
 });

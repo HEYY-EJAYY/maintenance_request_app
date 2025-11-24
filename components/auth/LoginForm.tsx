@@ -49,7 +49,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         <View style={styles.loginCard}>
           <View style={styles.welcomeBox}>
-            <Text style={styles.welcomeText}>Welcome Back!</Text>
+            <Text
+              style={[
+                styles.welcomeText,
+                activeTab === "admin" && styles.welcomeTextAdmin,
+              ]}
+            >
+              Welcome Back!
+            </Text>
             <Text style={styles.welcomeSubtext}>Login to continue</Text>
           </View>
 
@@ -71,7 +78,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.tab, activeTab === "admin" && styles.tabActive]}
+              style={[
+                styles.tab,
+                activeTab === "admin" && styles.tabActiveAdmin,
+              ]}
               onPress={() => setActiveTab("admin")}
             >
               <Text
@@ -105,21 +115,35 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
             <View style={styles.forgotPassword}>
               <TouchableOpacity>
-                <Text style={styles.forgotLink}>Forgot Password?</Text>
+                <Text
+                  style={[
+                    styles.forgotLink,
+                    activeTab === "admin" && styles.forgotLinkAdmin,
+                  ]}
+                >
+                  Forgot Password?
+                </Text>
               </TouchableOpacity>
             </View>
 
             <Button
               title="Log In"
               onPress={handleLogin}
-              variant="accent"
+              variant={activeTab === "admin" ? "primary" : "accent"}
               style={styles.loginButton}
             />
 
             <View style={styles.signupTextContainer}>
               <Text style={styles.signupText}>Don't have an account? </Text>
               <TouchableOpacity onPress={onSignUpPress}>
-                <Text style={styles.signupLink}>Sign Up</Text>
+                <Text
+                  style={[
+                    styles.signupLink,
+                    activeTab === "admin" && styles.signupLinkAdmin,
+                  ]}
+                >
+                  Sign Up
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -187,6 +211,9 @@ const styles = StyleSheet.create({
     color: colors.accent,
     marginBottom: 4,
   },
+  welcomeTextAdmin: {
+    color: colors.primary,
+  },
   welcomeSubtext: {
     fontSize: 14,
     color: colors.text.secondary,
@@ -210,6 +237,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderColor: colors.accent,
   },
+  tabActiveAdmin: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
   tabText: {
     fontSize: 14,
     fontWeight: "500",
@@ -230,6 +261,9 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontWeight: "500",
   },
+  forgotLinkAdmin: {
+    color: colors.primary,
+  },
   loginButton: {
     marginBottom: spacing.lg,
   },
@@ -246,5 +280,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.accent,
     fontWeight: "600",
+  },
+  signupLinkAdmin: {
+    color: colors.primary,
   },
 });
