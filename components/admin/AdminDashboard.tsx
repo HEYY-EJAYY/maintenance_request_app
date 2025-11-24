@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { borderRadius, colors, spacing } from "../../config/theme";
 import { MOCK_REQUESTS } from "../../utils/constants";
+import { RequestCard } from "../admin/RequestCard";
 import { BottomNavigation } from "../common/BottomNavigation";
-import { RequestCard } from "../dashboard/RequestCard";
 
 interface AdminDashboardProps {
   onNavigate?: (page: string) => void;

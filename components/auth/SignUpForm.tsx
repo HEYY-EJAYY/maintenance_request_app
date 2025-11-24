@@ -20,6 +20,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
   onSignUp,
   onBackToLogin,
 }) => {
+  const [activeTab, setActiveTab] = useState("homeowner");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
@@ -59,6 +60,38 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
           <View style={styles.welcomeBox}>
             <Text style={styles.welcomeText}>Create Account</Text>
             <Text style={styles.welcomeSubtext}>Sign up to get started</Text>
+          </View>
+
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[
+                styles.tab,
+                activeTab === "homeowner" && styles.tabActive,
+              ]}
+              onPress={() => setActiveTab("homeowner")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "homeowner" && styles.tabTextActive,
+                ]}
+              >
+                Homeowner
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === "admin" && styles.tabActive]}
+              onPress={() => setActiveTab("admin")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "admin" && styles.tabTextActive,
+                ]}
+              >
+                Admin
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.form}>
@@ -152,8 +185,8 @@ const styles = StyleSheet.create({
   signupHeader: {
     zIndex: 2,
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: 40,
+    marginBottom: 40,
   },
   headerTitle: {
     fontSize: 32,
@@ -175,12 +208,11 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     zIndex: 2,
-    marginBottom: 40,
     ...shadows.large,
   },
   welcomeBox: {
     alignItems: "center",
-    marginBottom: spacing.xl,
+    marginBottom: spacing.xxl,
   },
   welcomeText: {
     fontSize: 22,
@@ -191,6 +223,33 @@ const styles = StyleSheet.create({
   welcomeSubtext: {
     fontSize: 14,
     color: colors.text.secondary,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    gap: spacing.md,
+    marginBottom: spacing.xxl,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.sm,
+    alignItems: "center",
+  },
+  tabActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.text.secondary,
+  },
+  tabTextActive: {
+    color: colors.white,
   },
   form: {
     width: "100%",

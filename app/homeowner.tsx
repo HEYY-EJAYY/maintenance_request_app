@@ -34,7 +34,8 @@ interface HomeownerAppProps {
 }
 
 export const HomeownerApp: React.FC<HomeownerAppProps> = ({ onLogout }) => {
-  const [currentPage, setCurrentPage] = useState<HomeownerPageType>("dashboard");
+  const [currentPage, setCurrentPage] =
+    useState<HomeownerPageType>("dashboard");
   const [messages, setMessages] = useState([
     {
       id: 1,
