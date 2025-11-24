@@ -178,6 +178,7 @@ export default function MaintenanceApp() {
           activeTab="home"
           onTabPress={(tab) => {
             if (tab === "home") setCurrentPage("homeowner-dashboard");
+            if (tab === "notifications") setCurrentPage("notifications");
           }}
         />
       </View>
@@ -467,6 +468,15 @@ export default function MaintenanceApp() {
             </TouchableOpacity>
           </View>
         </ScrollView>
+
+        {/* Bottom Navigation */}
+        <BottomNavigation
+          activeTab="notifications"
+          onTabPress={(tab) => {
+            if (tab === "home") setCurrentPage("homeowner-dashboard");
+            if (tab === "request-detail") setCurrentPage("submit-request");
+          }}
+        />
       </View>
     );
   }
