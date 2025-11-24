@@ -30,6 +30,7 @@ type PageType =
   | "submit-request"
   | "request-detail"
   | "chat"
+  | "technical-issue"
   | "admin-dashboard";
 
 export default function MaintenanceApp() {
@@ -333,10 +334,62 @@ export default function MaintenanceApp() {
         <View style={styles.chatFooter}>
           <Button
             title="Continue"
-            onPress={() => setCurrentPage("homeowner-dashboard")}
+            onPress={() => setCurrentPage("technical-issue")}
             variant="accent"
           />
         </View>
+      </View>
+    );
+  }
+
+  // Technical Issue Page
+  if (currentPage === "technical-issue") {
+    return (
+      <View style={styles.dashboardContainer}>
+        {/* Header */}
+        <View style={styles.submitHeader}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => setCurrentPage("chat")}
+          >
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.submitHeaderTitle}>Technical Issue</Text>
+        </View>
+
+        {/* Update Card */}
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.technicalContainer}>
+            <View style={styles.technicalCard}>
+              <View style={styles.updateLabel}>
+                <Text style={styles.updateLabelText}>UPDATE</Text>
+              </View>
+              <Text style={styles.updateText}>
+                The lights in the living room have been fixed.
+              </Text>
+
+              <View style={styles.technicianInfo}>
+                <Image
+                  source={{
+                    uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jerrianne",
+                  }}
+                  style={styles.technicianAvatar}
+                />
+                <View style={styles.technicianDetails}>
+                  <Text style={styles.technicianName}>Jerrianne Alejandria</Text>
+                  <Text style={styles.technicianDate}>October 20</Text>
+                </View>
+              </View>
+
+              <Button
+                title="Done"
+                onPress={() => setCurrentPage("homeowner-dashboard")}
+                variant="accent"
+                style={styles.doneButton}
+              />
+            </View>
+          </View>
+        </ScrollView>
       </View>
     );
   }
@@ -631,5 +684,65 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+  } as ViewStyle,
+  technicalContainer: {
+    padding: spacing.xl,
+  } as ViewStyle,
+  technicalCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: spacing.xl,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  } as ViewStyle,
+  updateLabel: {
+    backgroundColor: colors.accent,
+    alignSelf: "flex-start",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
+    marginBottom: spacing.lg,
+  } as ViewStyle,
+  updateLabelText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: colors.white,
+    letterSpacing: 1,
+  } as TextStyle,
+  updateText: {
+    fontSize: 16,
+    color: colors.text.primary,
+    lineHeight: 24,
+    marginBottom: spacing.xl,
+  } as TextStyle,
+  technicianInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  } as ViewStyle,
+  technicianAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  } as ImageStyle,
+  technicianDetails: {
+    flex: 1,
+  } as ViewStyle,
+  technicianName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+  } as TextStyle,
+  technicianDate: {
+    fontSize: 14,
+    color: colors.text.secondary,
+  } as TextStyle,
+  doneButton: {
+    marginTop: spacing.md,
   } as ViewStyle,
 });
