@@ -27,13 +27,12 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleSignUp = () => {
-    // Validate form here
     if (password === confirmPassword) {
       onSignUp();
     } else {
-      // Show error
       alert("Passwords do not match!");
     }
   };
@@ -69,6 +68,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             <Text style={styles.welcomeSubtext}>Sign up to get started</Text>
           </View>
 
+          {/* Tabs */}
           <View style={styles.tabContainer}>
             <TouchableOpacity
               style={[
@@ -86,6 +86,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
                 Homeowner
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[
                 styles.tab,
@@ -104,6 +105,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             </TouchableOpacity>
           </View>
 
+          {/* FORM */}
           <View style={styles.form}>
             <Input
               label="Full Name"
@@ -152,6 +154,35 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               secureTextEntry
             />
 
+            {/* ★ FIXED CHECKBOX ★ */}
+            <TouchableOpacity
+              style={styles.rememberMeContainer}
+              onPress={() => setRememberMe(!rememberMe)}
+              activeOpacity={0.8}
+            >
+              <View
+                style={[
+                  styles.checkboxBox,
+                  rememberMe &&
+                    (activeTab === "admin"
+                      ? styles.checkboxBoxActiveAdmin
+                      : styles.checkboxBoxActive),
+                ]}
+              />
+
+              <Text
+                style={[
+                  styles.rememberMeText,
+                  rememberMe &&
+                    (activeTab === "admin"
+                      ? styles.rememberMeTextActiveAdmin
+                      : styles.rememberMeTextActive),
+                ]}
+              >
+                Remember Me
+              </Text>
+            </TouchableOpacity>
+
             <Button
               title="Sign Up"
               onPress={handleSignUp}
@@ -178,6 +209,9 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
     </ImageBackground>
   );
 };
+
+/* ------------------------ STYLES ------------------------ */
+
 const styles = StyleSheet.create({
   signupBackground: {
     flex: 1,
@@ -252,7 +286,6 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: spacing.xl,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.white,
@@ -278,6 +311,44 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
   },
+
+  /* ---------- FIXED CHECKBOX ---------- */
+  rememberMeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: spacing.md,
+  },
+  checkboxBox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: 4,
+    backgroundColor: colors.white,
+  },
+  checkboxBoxActive: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+  },
+  checkboxBoxActiveAdmin: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  rememberMeText: {
+    color: colors.text.secondary,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  rememberMeTextActive: {
+    color: colors.accent,
+    fontWeight: "600",
+  },
+  rememberMeTextActiveAdmin: {
+    color: colors.primary,
+    fontWeight: "600",
+  },
+
   signupButton: {
     marginBottom: spacing.lg,
     marginTop: spacing.md,
