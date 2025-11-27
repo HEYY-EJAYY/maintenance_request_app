@@ -19,6 +19,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -31,6 +32,188 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
   >("admin-dashboard");
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [showImageOptions, setShowImageOptions] = useState(false);
+  const [showRequestsModal, setShowRequestsModal] = useState(false);
+  const [showPendingModal, setShowPendingModal] = useState(false);
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
+  const [showInProgressModal, setShowInProgressModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [showRequestDetailModal, setShowRequestDetailModal] = useState(false);
+  const [showAssignTechnicianModal, setShowAssignTechnicianModal] =
+    useState(false);
+  const [technicianName, setTechnicianName] = useState("");
+  const [technicianNotes, setTechnicianNotes] = useState("");
+  const [showCompleteRequestModal, setShowCompleteRequestModal] =
+    useState(false);
+  const [completionNotes, setCompletionNotes] = useState("");
+
+  // Mock data for requests with initial state
+  const [allRequests, setAllRequests] = useState([
+    {
+      id: "REQ-2025-0012",
+      date: "2025-10-25",
+      type: "Plumbing",
+      status: "pending",
+      unit: "Unit 12A",
+      description: "Kitchen sink leaking",
+      priority: "High",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0003",
+      date: "2025-10-18",
+      type: "Electrical",
+      status: "pending",
+      unit: "Unit 5A",
+      description: "Living room lights not working",
+      priority: "Medium",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0006",
+      date: "2025-09-28",
+      type: "General",
+      status: "pending",
+      unit: "Unit 7C",
+      description: "Door handle repair",
+      priority: "Low",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0201",
+      date: "2025-08-20",
+      type: "General",
+      status: "pending",
+      unit: "Unit 10C",
+      description: "AC not cooling properly",
+      priority: "High",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0101",
+      date: "2025-07-24",
+      type: "Electrical",
+      status: "pending",
+      unit: "Unit 33H",
+      description: "Power outlet not working",
+      priority: "Medium",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0040",
+      date: "2025-04-15",
+      type: "Plumbing",
+      status: "pending",
+      unit: "Unit 3E",
+      description: "Bathroom faucet dripping",
+      priority: "Low",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0901",
+      date: "2025-04-13",
+      type: "Electrical",
+      status: "pending",
+      unit: "Unit 9B",
+      description: "Circuit breaker tripping",
+      priority: "High",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0015",
+      date: "2025-03-20",
+      type: "General",
+      status: "pending",
+      unit: "Unit 15D",
+      description: "Window repair needed",
+      priority: "Medium",
+      assignedTechnician: "",
+      technicianNotes: "",
+      completionNotes: "",
+      completedDate: "",
+    },
+    {
+      id: "REQ-2025-0022",
+      date: "2025-11-01",
+      type: "Plumbing",
+      status: "completed",
+      unit: "Unit 22F",
+      description: "Toilet flush fixed",
+      priority: "Medium",
+      assignedTechnician: "John Smith",
+      technicianNotes: "Replaced flush mechanism",
+      completionNotes: "Issue resolved successfully",
+      completedDate: "2025-11-02",
+    },
+    {
+      id: "REQ-2025-0033",
+      date: "2025-11-02",
+      type: "Electrical",
+      status: "completed",
+      unit: "Unit 33G",
+      description: "Light switch replacement",
+      priority: "Low",
+      assignedTechnician: "Mike Johnson",
+      technicianNotes: "Installed new switch",
+      completionNotes: "Working properly now",
+      completedDate: "2025-11-03",
+    },
+  ]);
+
+  const pendingRequests = allRequests.filter((req) => req.status === "pending");
+  const completedRequests = allRequests.filter(
+    (req) => req.status === "completed"
+  );
+  const inProgressRequests = allRequests.filter(
+    (req) => req.status === "in-progress"
+  );
+
+  const getStatusStyle = (status: string) => {
+    if (status === "pending")
+      return { backgroundColor: "#fbbf24", color: "#92400e" };
+    if (status === "in-progress")
+      return { backgroundColor: "#93c5fd", color: "#1e40af" };
+    if (status === "completed")
+      return { backgroundColor: "#86efac", color: "#166534" };
+    return {};
+  };
+
+  const getStatusText = (status: string) => {
+    if (status === "pending") return "Pending";
+    if (status === "in-progress") return "In progress";
+    if (status === "completed") return "Completed";
+    return status;
+  };
+
+  const getPriorityStyle = (priority: string) => {
+    if (priority === "High")
+      return { backgroundColor: "#fecaca", color: "#dc2626" };
+    if (priority === "Medium")
+      return { backgroundColor: "#fed7aa", color: "#ea580c" };
+    if (priority === "Low")
+      return { backgroundColor: "#bbf7d0", color: "#16a34a" };
+    return {};
+  };
 
   // Function to handle image upload
   const handleImageUpload = async () => {
@@ -107,377 +290,440 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
     return { uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rica" };
   };
 
-  // Admin Profile Page
-  if (currentPage === "admin-profile") {
-    return (
-      <SafeAreaView style={styles.dashboardContainer}>
-        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-        {/* Header */}
-        <View style={styles.submitHeader}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setCurrentPage("admin-dashboard")}
-          >
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
-          <Text style={styles.submitHeaderTitle}>Profile</Text>
-          <View style={styles.headerSpacer} />
-        </View>
+  // Function to handle request click
+  const handleRequestClick = (request: any) => {
+    setSelectedRequest(request);
+    setShowRequestDetailModal(true);
+  };
 
-        {/* Profile Content */}
-        <ScrollView
-          style={styles.profileContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Profile Avatar Section with Edit Button */}
-          <View style={styles.profileAvatarSection}>
-            <TouchableOpacity
-              style={styles.avatarContainer}
-              onPress={handleEditAvatar}
-            >
-              <Image
-                source={getProfileImageSource()}
-                style={styles.profileAvatarLarge}
-              />
-              <View style={styles.editAvatarButton}>
-                <Text style={styles.editAvatarIcon}>📷</Text>
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.profileRole}>Admin</Text>
-          </View>
+  // Function to assign technician
+  const handleAssignTechnician = () => {
+    if (!selectedRequest) return;
 
-          {/* Profile Info Card */}
-          <View style={styles.profileCard}>
-            <View style={styles.profileField}>
-              <Text style={styles.profileFieldLabel}>Name :</Text>
-              <View style={styles.profileFieldValue}>
-                <Text style={styles.profileFieldValueText}>Rica Mae Rojas</Text>
-              </View>
-            </View>
+    if (!technicianName.trim()) {
+      Alert.alert("Error", "Please enter technician name");
+      return;
+    }
 
-            <View style={styles.profileField}>
-              <Text style={styles.profileFieldLabel}>Email :</Text>
-              <View style={styles.profileFieldValue}>
-                <Text style={styles.profileFieldValueText}>
-                  ricamaerojas108@gmail.com
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.profileField}>
-              <Text style={styles.profileFieldLabel}>Address :</Text>
-              <View style={styles.profileFieldValue}>
-                <Text style={styles.profileFieldValueText}>
-                  Butuan City, Philippines
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.profileField}>
-              <Text style={styles.profileFieldLabel}>Phone:</Text>
-              <View style={styles.profileFieldValue}>
-                <Text style={styles.profileFieldValueText}>09565689390</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Logout Button */}
-          <TouchableOpacity style={styles.adminLogoutButton} onPress={onLogout}>
-            <Text style={styles.adminLogoutButtonText}>Log out</Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        {/* Image Options Modal */}
-        <Modal
-          visible={showImageOptions}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowImageOptions(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.imageOptionsModal}>
-              <Text style={styles.modalTitle}>Change Profile Photo</Text>
-
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={handleTakePhoto}
-              >
-                <Text style={styles.optionButtonText}>Take Photo</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={handleImageUpload}
-              >
-                <Text style={styles.optionButtonText}>Choose from Library</Text>
-              </TouchableOpacity>
-
-              {profileImage && (
-                <TouchableOpacity
-                  style={[styles.optionButton, styles.removeButton]}
-                  onPress={handleRemovePhoto}
-                >
-                  <Text style={styles.removeButtonText}>
-                    Remove Current Photo
-                  </Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                style={[styles.optionButton, styles.cancelButton]}
-                onPress={() => setShowImageOptions(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Bottom Navigation */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("admin-dashboard")}
-          >
-            <Text style={styles.navIcon}>🏠</Text>
-            <Text style={styles.navText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("maintenance-requests")}
-          >
-            <Text style={styles.navIcon}>📄</Text>
-            <Text style={styles.navText}>Tasks</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("admin-notifications")}
-          >
-            <Text style={styles.navIcon}>🔔</Text>
-            <Text style={styles.navText}>Alerts</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+    const updatedRequests = allRequests.map((req) =>
+      req.id === selectedRequest.id
+        ? {
+            ...req,
+            status: "in-progress",
+            assignedTechnician: technicianName,
+            technicianNotes: technicianNotes,
+          }
+        : req
     );
-  }
 
-  // Maintenance Requests List Page
-  if (currentPage === "maintenance-requests") {
-    const requests = [
-      {
-        id: "REQ-2025-0012",
-        date: "2025-10-25",
-        type: "Plumbing",
-        status: "pending",
-        unit: "Unit 12A",
-      },
-      {
-        id: "REQ-2025-0003",
-        date: "2025-10-18",
-        type: "Electrical",
-        status: "in-progress",
-        unit: "Unit 5A",
-      },
-      {
-        id: "REQ-2025-0006",
-        date: "2025-09-28",
-        type: "General",
-        status: "completed",
-        unit: "Unit 7C",
-      },
-      {
-        id: "REQ-2025-0201",
-        date: "2025-08-20",
-        type: "General",
-        status: "completed",
-        unit: "Unit 10C",
-      },
-      {
-        id: "REQ-2025-0101",
-        date: "2025-07-24",
-        type: "Electrical",
-        status: "in-progress",
-        unit: "Unit 33H",
-      },
-      {
-        id: "REQ-2025-0040",
-        date: "2025-04-15",
-        type: "Plumbing",
-        status: "in-progress",
-        unit: "Unit 3E",
-      },
-      {
-        id: "REQ-2025-0901",
-        date: "2025-04-13",
-        type: "Electrical",
-        status: "completed",
-        unit: "Unit 9B",
-      },
-    ];
+    setAllRequests(updatedRequests);
+    setShowAssignTechnicianModal(false);
+    setShowRequestDetailModal(false);
+    setTechnicianName("");
+    setTechnicianNotes("");
+    setSelectedRequest(null);
+    Alert.alert(
+      "Success",
+      "Technician assigned and status updated to In Progress"
+    );
+  };
 
-    const getStatusStyle = (status: string) => {
-      if (status === "pending")
-        return { backgroundColor: "#fbbf24", color: "#92400e" };
-      if (status === "in-progress")
-        return { backgroundColor: "#93c5fd", color: "#1e40af" };
-      if (status === "completed")
-        return { backgroundColor: "#86efac", color: "#166534" };
-      return {};
-    };
+  // Function to complete request
+  const handleCompleteRequest = () => {
+    if (!selectedRequest) return;
 
-    const getStatusText = (status: string) => {
-      if (status === "pending") return "Pending";
-      if (status === "in-progress") return "In progress";
-      if (status === "completed") return "Completed";
-      return status;
-    };
+    if (!completionNotes.trim()) {
+      Alert.alert("Error", "Please enter completion notes");
+      return;
+    }
 
-    return (
-      <SafeAreaView style={styles.dashboardContainer}>
-        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-        {/* Header */}
-        <View style={styles.submitHeader}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setCurrentPage("admin-dashboard")}
-          >
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
-          <Text style={styles.submitHeaderTitle}>Maintenance Request</Text>
-          <View style={styles.headerSpacer} />
-        </View>
+    const updatedRequests = allRequests.map((req) =>
+      req.id === selectedRequest.id
+        ? {
+            ...req,
+            status: "completed",
+            completionNotes: completionNotes,
+            completedDate: new Date().toISOString().split("T")[0],
+          }
+        : req
+    );
 
-        {/* Table Header */}
-        <View style={styles.tableContainer}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderCell}>Request ID</Text>
-            <Text style={styles.tableHeaderCell}>Date</Text>
-            <Text style={styles.tableHeaderCell}>Type</Text>
-            <Text style={styles.tableHeaderCell}>Status</Text>
+    setAllRequests(updatedRequests);
+    setShowCompleteRequestModal(false);
+    setShowRequestDetailModal(false);
+    setCompletionNotes("");
+    setSelectedRequest(null);
+    Alert.alert("Success", "Request marked as completed");
+  };
+
+  // Function to close all modals and reset states
+  const closeAllModals = () => {
+    setShowRequestDetailModal(false);
+    setShowAssignTechnicianModal(false);
+    setShowCompleteRequestModal(false);
+    setSelectedRequest(null);
+    setTechnicianName("");
+    setTechnicianNotes("");
+    setCompletionNotes("");
+  };
+
+  // Request Modal Component
+  const RequestModal = ({
+    visible,
+    onClose,
+    title,
+    requests,
+    showStatus = true,
+    clickable = false,
+  }: {
+    visible: boolean;
+    onClose: () => void;
+    title: string;
+    requests: any[];
+    showStatus?: boolean;
+    clickable?: boolean;
+  }) => (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.requestsModal}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{title}</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>×</Text>
+            </TouchableOpacity>
           </View>
-          <ScrollView
-            style={styles.tableBody}
-            showsVerticalScrollIndicator={false}
-          >
+
+          <ScrollView style={styles.requestsList}>
             {requests.map((request, index) => (
-              <View key={index} style={styles.tableRow}>
-                <View style={styles.tableCell}>
-                  <Text style={styles.requestIdText}>{request.id}</Text>
-                  <Text style={styles.unitText}>{request.unit}</Text>
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.requestModalCard,
+                  clickable && styles.clickableCard,
+                ]}
+                onPress={
+                  clickable ? () => handleRequestClick(request) : undefined
+                }
+              >
+                <View style={styles.requestModalHeader}>
+                  <Text style={styles.requestModalId}>{request.id}</Text>
+                  <View style={styles.requestModalBadges}>
+                    {showStatus && (
+                      <Text
+                        style={[
+                          styles.requestModalStatus,
+                          getStatusStyle(request.status),
+                        ]}
+                      >
+                        {getStatusText(request.status)}
+                      </Text>
+                    )}
+                    <Text
+                      style={[
+                        styles.requestModalPriority,
+                        getPriorityStyle(request.priority),
+                      ]}
+                    >
+                      {request.priority}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.tableCell}>
-                  <Text style={styles.dateText2}>{request.date}</Text>
+
+                <Text style={styles.requestModalType}>{request.type}</Text>
+                <Text style={styles.requestModalDescription}>
+                  {request.description}
+                </Text>
+
+                <View style={styles.requestModalFooter}>
+                  <Text style={styles.requestModalUnit}>{request.unit}</Text>
+                  <Text style={styles.requestModalDate}>{request.date}</Text>
                 </View>
-                <View style={styles.tableCell}>
-                  <Text style={styles.typeText}>{request.type}</Text>
-                </View>
-                <View style={styles.tableCell}>
-                  <Text
-                    style={[
-                      styles.statusBadge2,
-                      getStatusStyle(request.status),
-                    ]}
-                  >
-                    {getStatusText(request.status)}
-                  </Text>
-                </View>
-              </View>
+
+                {request.assignedTechnician && (
+                  <View style={styles.technicianInfo}>
+                    <Text style={styles.technicianLabel}>Assigned to: </Text>
+                    <Text style={styles.technicianName}>
+                      {request.assignedTechnician}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
+      </View>
+    </Modal>
+  );
 
-        {/* Bottom Navigation */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("admin-dashboard")}
-          >
-            <Text style={styles.navIcon}>🏠</Text>
-            <Text style={styles.navText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.navIcon}>📄</Text>
-            <Text style={styles.navText}>Tasks</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("admin-notifications")}
-          >
-            <Text style={styles.navIcon}>🔔</Text>
-            <Text style={styles.navText}>Alerts</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  // Request Detail Modal Component
+  const RequestDetailModal = ({
+    visible,
+    onClose,
+    request,
+  }: {
+    visible: boolean;
+    onClose: () => void;
+    request: any;
+  }) => {
+    if (!request) return null;
 
-  // Admin Notifications Page
-  if (currentPage === "admin-notifications") {
-    const notifications = [
-      { text: "Completed Request Unit 9B", time: "Just now" },
-      { text: "Completed Request Unit 8E", time: "1 hr ago" },
-      { text: "Technician Assigned (Plumbing)", time: "2 hrs ago" },
-      { text: "Technician Assigned (Electrical)", time: "4 hrs ago" },
-      { text: "Completed Request Unit 10C", time: "1 day ago" },
-      { text: "Technician Assigned (Electrical)", time: "2 days ago" },
-    ];
     return (
-      <SafeAreaView style={styles.dashboardContainer}>
-        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-        {/* Header */}
-        <View style={styles.adminNotificationHeader}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => setCurrentPage("admin-dashboard")}
-          >
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
-          <View style={styles.adminNotificationHeaderContent}>
-            <Text style={styles.notificationTitle}>Notification</Text>
-            <Text style={styles.notificationDate}>
-              Tuesday, January 14, 2025
-            </Text>
+      <Modal
+        visible={visible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.detailModal}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Request Details</Text>
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.detailContent}>
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Request ID</Text>
+                <Text style={styles.detailValue}>{request.id}</Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Type</Text>
+                <Text style={styles.detailValue}>{request.type}</Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Description</Text>
+                <Text style={styles.detailValue}>{request.description}</Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Unit</Text>
+                <Text style={styles.detailValue}>{request.unit}</Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Date Submitted</Text>
+                <Text style={styles.detailValue}>{request.date}</Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Priority</Text>
+                <Text
+                  style={[
+                    styles.priorityBadge,
+                    getPriorityStyle(request.priority),
+                  ]}
+                >
+                  {request.priority}
+                </Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Status</Text>
+                <Text
+                  style={[styles.statusBadge, getStatusStyle(request.status)]}
+                >
+                  {getStatusText(request.status)}
+                </Text>
+              </View>
+
+              {request.assignedTechnician && (
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailLabel}>Assigned Technician</Text>
+                  <Text style={styles.detailValue}>
+                    {request.assignedTechnician}
+                  </Text>
+                </View>
+              )}
+
+              {request.technicianNotes && (
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailLabel}>Technician Notes</Text>
+                  <Text style={styles.detailValue}>
+                    {request.technicianNotes}
+                  </Text>
+                </View>
+              )}
+
+              {request.completionNotes && (
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailLabel}>Completion Notes</Text>
+                  <Text style={styles.detailValue}>
+                    {request.completionNotes}
+                  </Text>
+                </View>
+              )}
+
+              {request.completedDate && (
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailLabel}>Completed Date</Text>
+                  <Text style={styles.detailValue}>
+                    {request.completedDate}
+                  </Text>
+                </View>
+              )}
+
+              {/* Action Buttons based on status */}
+              <View style={styles.actionButtons}>
+                {request.status === "pending" && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.assignButton]}
+                    onPress={() => setShowAssignTechnicianModal(true)}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      Assign Technician
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                {request.status === "in-progress" && (
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.completeButton]}
+                    onPress={() => setShowCompleteRequestModal(true)}
+                  >
+                    <Text style={styles.actionButtonText}>
+                      Mark as Completed
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.closeButton]}
+                  onPress={onClose}
+                >
+                  <Text style={styles.actionButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
-        {/* Notifications List */}
-        <ScrollView
-          style={styles.adminNotificationsList}
-          showsVerticalScrollIndicator={false}
-        >
-          {notifications.map((notif, idx) => (
-            <View key={idx} style={styles.adminNotificationCard}>
-              <Text style={styles.adminNotificationText}>{notif.text}</Text>
-              <Text style={styles.notificationTime}>{notif.time}</Text>
-            </View>
-          ))}
-        </ScrollView>
-        {/* Bottom Navigation */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("admin-dashboard")}
-          >
-            <Text style={styles.navIcon}>🏠</Text>
-            <Text style={styles.navText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("maintenance-requests")}
-          >
-            <Text style={styles.navIcon}>📄</Text>
-            <Text style={styles.navText}>Tasks</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentPage("admin-notifications")}
-          >
-            <Text style={styles.navIcon}>🔔</Text>
-            <Text style={styles.navText}>Alerts</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      </Modal>
     );
-  }
+  };
+
+  // Assign Technician Modal
+  const AssignTechnicianModal = ({
+    visible,
+    onClose,
+  }: {
+    visible: boolean;
+    onClose: () => void;
+  }) => (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.assignModal}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Assign Technician</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>×</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.assignContent}>
+            <Text style={styles.assignLabel}>Technician Name *</Text>
+            <TextInput
+              style={styles.textInput}
+              value={technicianName}
+              onChangeText={setTechnicianName}
+              placeholder="Enter technician name"
+            />
+
+            <Text style={styles.assignLabel}>Technician Notes</Text>
+            <TextInput
+              style={[styles.textInput, styles.textArea]}
+              value={technicianNotes}
+              onChangeText={setTechnicianNotes}
+              placeholder="Enter any notes for the technician"
+              multiline
+              numberOfLines={4}
+            />
+
+            <View style={styles.assignButtons}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={onClose}
+              >
+                <Text style={styles.actionButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.confirmButton]}
+                onPress={handleAssignTechnician}
+              >
+                <Text style={styles.actionButtonText}>Assign & Start Work</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+
+  // Complete Request Modal
+  const CompleteRequestModal = ({
+    visible,
+    onClose,
+  }: {
+    visible: boolean;
+    onClose: () => void;
+  }) => (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.completeModal}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Complete Request</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>×</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.completeContent}>
+            <Text style={styles.completeLabel}>Completion Notes *</Text>
+            <TextInput
+              style={[styles.textInput, styles.textArea]}
+              value={completionNotes}
+              onChangeText={setCompletionNotes}
+              placeholder="Describe the work completed and any final notes"
+              multiline
+              numberOfLines={6}
+            />
+
+            <View style={styles.completeButtons}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={onClose}
+              >
+                <Text style={styles.actionButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.confirmCompleteButton]}
+                onPress={handleCompleteRequest}
+              >
+                <Text style={styles.actionButtonText}>Mark as Completed</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
 
   // Admin Dashboard
   if (currentPage === "admin-dashboard") {
@@ -509,9 +755,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
           {/* Dashboard Overview Section with Background Image */}
           <View style={styles.overviewContainer}>
             <ImageBackground
-              source={{
-                uri: "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-              }}
+              source={require("../assets/images/camella.jpeg")}
               style={styles.overviewBackground}
               resizeMode="cover"
             >
@@ -524,28 +768,38 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
 
                 {/* Stats Grid - 4 cards in 2x2 layout */}
                 <View style={styles.statsGrid}>
-                  <View
+                  <TouchableOpacity
                     style={[styles.statCard, { backgroundColor: "#93c5fd" }]}
+                    onPress={() => setShowRequestsModal(true)}
                   >
-                    <Text style={styles.statNumber}>12</Text>
+                    <Text style={styles.statNumber}>{allRequests.length}</Text>
                     <Text style={styles.statLabel}>Total Requests</Text>
                     <Text style={styles.statSubtext}>Last 3 days</Text>
-                  </View>
-                  <View
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
                     style={[styles.statCard, { backgroundColor: "#fbbf24" }]}
+                    onPress={() => setShowPendingModal(true)}
                   >
-                    <Text style={styles.statNumber}>8</Text>
+                    <Text style={styles.statNumber}>
+                      {pendingRequests.length}
+                    </Text>
                     <Text style={styles.statLabel}>Pending</Text>
                     <Text style={styles.statSubtext}>Needs attention</Text>
-                  </View>
-                  <View
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
                     style={[styles.statCard, { backgroundColor: "#86efac" }]}
+                    onPress={() => setShowCompletedModal(true)}
                   >
-                    <Text style={styles.statNumber}>8</Text>
+                    <Text style={styles.statNumber}>
+                      {completedRequests.length}
+                    </Text>
                     <Text style={styles.statLabel}>Completed</Text>
                     <Text style={styles.statSubtext}>This week</Text>
-                  </View>
-                  <View
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
                     style={[
                       styles.statCard,
                       {
@@ -554,11 +808,14 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
                         borderColor: "#e5e7eb",
                       },
                     ]}
+                    onPress={() => setShowInProgressModal(true)}
                   >
-                    <Text style={styles.statNumber}>10</Text>
+                    <Text style={styles.statNumber}>
+                      {inProgressRequests.length}
+                    </Text>
                     <Text style={styles.statLabel}>In progress</Text>
                     <Text style={styles.statSubtext}>Notification</Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             </ImageBackground>
@@ -717,6 +974,62 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+
+        {/* Request Modals */}
+        <RequestModal
+          visible={showRequestsModal}
+          onClose={() => setShowRequestsModal(false)}
+          title={`All Requests (${allRequests.length})`}
+          requests={allRequests}
+          showStatus={true}
+          clickable={true}
+        />
+
+        <RequestModal
+          visible={showPendingModal}
+          onClose={() => setShowPendingModal(false)}
+          title={`Pending Requests (${pendingRequests.length})`}
+          requests={pendingRequests}
+          showStatus={true}
+          clickable={true}
+        />
+
+        <RequestModal
+          visible={showCompletedModal}
+          onClose={() => setShowCompletedModal(false)}
+          title={`Completed Requests (${completedRequests.length})`}
+          requests={completedRequests}
+          showStatus={true}
+          clickable={true}
+        />
+
+        <RequestModal
+          visible={showInProgressModal}
+          onClose={() => setShowInProgressModal(false)}
+          title={`In Progress Requests (${inProgressRequests.length})`}
+          requests={inProgressRequests}
+          showStatus={true}
+          clickable={true}
+        />
+
+        {/* Request Detail Modal */}
+        <RequestDetailModal
+          visible={showRequestDetailModal}
+          onClose={() => setShowRequestDetailModal(false)}
+          request={selectedRequest}
+        />
+
+        {/* Assign Technician Modal */}
+        <AssignTechnicianModal
+          visible={showAssignTechnicianModal}
+          onClose={() => setShowAssignTechnicianModal(false)}
+        />
+
+        {/* Complete Request Modal */}
+        <CompleteRequestModal
+          visible={showCompleteRequestModal}
+          onClose={() => setShowCompleteRequestModal(false)}
+        />
 
         {/* Image Options Modal */}
         <Modal
@@ -1349,19 +1662,257 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "flex-end",
   },
+  requestsModal: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "90%",
+  },
+  detailModal: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "90%",
+  },
+  assignModal: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+  },
+  completeModal: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1f2937",
+  },
+  closeButton: {
+    padding: 8,
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: "#6b7280",
+    fontWeight: "bold",
+  },
+  requestsList: {
+    padding: 16,
+  },
+  requestModalCard: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  clickableCard: {
+    borderColor: "#3b82f6",
+    borderWidth: 2,
+  },
+  requestModalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  requestModalId: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1f2937",
+  },
+  requestModalBadges: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  requestModalStatus: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    fontSize: 10,
+    fontWeight: "bold",
+    overflow: "hidden",
+  },
+  requestModalPriority: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    fontSize: 10,
+    fontWeight: "bold",
+    overflow: "hidden",
+  },
+  requestModalType: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1f2937",
+    marginBottom: 4,
+  },
+  requestModalDescription: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginBottom: 12,
+  },
+  requestModalFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  requestModalUnit: {
+    fontSize: 12,
+    color: "#9ca3af",
+  },
+  requestModalDate: {
+    fontSize: 12,
+    color: "#9ca3af",
+  },
+  technicianInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#f3f4f6",
+  },
+  technicianLabel: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  technicianName: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1f2937",
+  },
+  // Detail Modal Styles
+  detailContent: {
+    padding: 20,
+  },
+  detailSection: {
+    marginBottom: 16,
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#6b7280",
+    marginBottom: 4,
+  },
+  detailValue: {
+    fontSize: 16,
+    color: "#1f2937",
+  },
+  priorityBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    fontSize: 12,
+    fontWeight: "bold",
+    overflow: "hidden",
+    alignSelf: "flex-start",
+  },
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    fontSize: 12,
+    fontWeight: "bold",
+    overflow: "hidden",
+    alignSelf: "flex-start",
+  },
+  actionButtons: {
+    marginTop: 24,
+    gap: 12,
+  },
+  actionButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  assignButton: {
+    backgroundColor: "#f59e0b",
+  },
+  completeButton: {
+    backgroundColor: "#10b981",
+  },
+  confirmButton: {
+    backgroundColor: "#3b82f6",
+  },
+  confirmCompleteButton: {
+    backgroundColor: "#10b981",
+  },
+  cancelButton: {
+    backgroundColor: "#6b7280",
+  },
+  actionButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  // Assign Technician Modal Styles
+  assignContent: {
+    padding: 20,
+  },
+  assignLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1f2937",
+    marginBottom: 8,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 16,
+    backgroundColor: "white",
+  },
+  textArea: {
+    minHeight: 100,
+    textAlignVertical: "top",
+  },
+  assignButtons: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 16,
+  },
+  // Complete Request Modal Styles
+  completeContent: {
+    padding: 20,
+  },
+  completeLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1f2937",
+    marginBottom: 8,
+  },
+  completeButtons: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 16,
+  },
   imageOptionsModal: {
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
     paddingBottom: 40,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#1f2937",
   },
   optionButton: {
     paddingVertical: 16,
@@ -1381,13 +1932,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#dc2626",
     fontWeight: "600",
-  },
-  cancelButton: {
-    marginTop: 10,
-    paddingVertical: 16,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 12,
-    borderBottomWidth: 0,
   },
   cancelButtonText: {
     fontSize: 16,
