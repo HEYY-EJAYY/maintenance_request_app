@@ -7,10 +7,14 @@ interface AdminAppProps {
   onLogout: () => void;
 }
 
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   ImageBackground,
+  Modal,
+  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -25,6 +29,83 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
   const [currentPage, setCurrentPage] = useState<
     AdminPageType | "maintenance-requests"
   >("admin-dashboard");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [showImageOptions, setShowImageOptions] = useState(false);
+
+  // Function to handle image upload
+  const handleImageUpload = async () => {
+    // Request permission
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Sorry, we need camera roll permissions to upload images!"
+        );
+        return;
+      }
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+      setShowImageOptions(false);
+    }
+  };
+
+  // Function to take photo with camera
+  const handleTakePhoto = async () => {
+    // Request camera permission
+    if (Platform.OS !== "web") {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Sorry, we need camera permissions to take photos!"
+        );
+        return;
+      }
+    }
+
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+      setShowImageOptions(false);
+    }
+  };
+
+  // Function to remove current photo
+  const handleRemovePhoto = () => {
+    setProfileImage(null);
+    setShowImageOptions(false);
+  };
+
+  // Function to show image options modal
+  const handleEditAvatar = () => {
+    setShowImageOptions(true);
+  };
+
+  // Get the profile image source
+  const getProfileImageSource = () => {
+    if (profileImage) {
+      return { uri: profileImage };
+    }
+    return { uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rica" };
+  };
 
   // Admin Profile Page
   if (currentPage === "admin-profile") {
@@ -48,14 +129,20 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
           style={styles.profileContainer}
           showsVerticalScrollIndicator={false}
         >
-          {/* Profile Avatar Section */}
+          {/* Profile Avatar Section with Edit Button */}
           <View style={styles.profileAvatarSection}>
-            <Image
-              source={{
-                uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rica",
-              }}
-              style={styles.profileAvatarLarge}
-            />
+            <TouchableOpacity
+              style={styles.avatarContainer}
+              onPress={handleEditAvatar}
+            >
+              <Image
+                source={getProfileImageSource()}
+                style={styles.profileAvatarLarge}
+              />
+              <View style={styles.editAvatarButton}>
+                <Text style={styles.editAvatarIcon}>📷</Text>
+              </View>
+            </TouchableOpacity>
             <Text style={styles.profileRole}>Admin</Text>
           </View>
 
@@ -99,6 +186,52 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             <Text style={styles.adminLogoutButtonText}>Log out</Text>
           </TouchableOpacity>
         </ScrollView>
+
+        {/* Image Options Modal */}
+        <Modal
+          visible={showImageOptions}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowImageOptions(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.imageOptionsModal}>
+              <Text style={styles.modalTitle}>Change Profile Photo</Text>
+
+              <TouchableOpacity
+                style={styles.optionButton}
+                onPress={handleTakePhoto}
+              >
+                <Text style={styles.optionButtonText}>Take Photo</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.optionButton}
+                onPress={handleImageUpload}
+              >
+                <Text style={styles.optionButtonText}>Choose from Library</Text>
+              </TouchableOpacity>
+
+              {profileImage && (
+                <TouchableOpacity
+                  style={[styles.optionButton, styles.removeButton]}
+                  onPress={handleRemovePhoto}
+                >
+                  <Text style={styles.removeButtonText}>
+                    Remove Current Photo
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={[styles.optionButton, styles.cancelButton]}
+                onPress={() => setShowImageOptions(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* Bottom Navigation */}
         <View style={styles.bottomNav}>
@@ -305,17 +438,6 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
               Tuesday, January 14, 2025
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.smallProfilePic}
-            onPress={() => setCurrentPage("admin-profile")}
-          >
-            <Image
-              source={{
-                uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rica",
-              }}
-              style={styles.profileImage}
-            />
-          </TouchableOpacity>
         </View>
         {/* Notifications List */}
         <ScrollView
@@ -374,9 +496,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             onPress={() => setCurrentPage("admin-profile")}
           >
             <Image
-              source={{
-                uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rica",
-              }}
+              source={getProfileImageSource()}
               style={styles.profileImage}
             />
           </TouchableOpacity>
@@ -397,7 +517,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             >
               <View style={styles.overlay} />
               <View style={styles.overviewContent}>
-                {/* Blue Banner */}
+                {/* Banner */}
                 <View style={styles.overviewBanner}>
                   <Text style={styles.overviewTitle}>Dashboard Overview</Text>
                 </View>
@@ -598,6 +718,52 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
           </View>
         </ScrollView>
 
+        {/* Image Options Modal */}
+        <Modal
+          visible={showImageOptions}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowImageOptions(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.imageOptionsModal}>
+              <Text style={styles.modalTitle}>Change Profile Photo</Text>
+
+              <TouchableOpacity
+                style={styles.optionButton}
+                onPress={handleTakePhoto}
+              >
+                <Text style={styles.optionButtonText}>Take Photo</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.optionButton}
+                onPress={handleImageUpload}
+              >
+                <Text style={styles.optionButtonText}>Choose from Library</Text>
+              </TouchableOpacity>
+
+              {profileImage && (
+                <TouchableOpacity
+                  style={[styles.optionButton, styles.removeButton]}
+                  onPress={handleRemovePhoto}
+                >
+                  <Text style={styles.removeButtonText}>
+                    Remove Current Photo
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={[styles.optionButton, styles.cancelButton]}
+                onPress={() => setShowImageOptions(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         {/* Bottom Navigation */}
         <View style={styles.bottomNav}>
           <TouchableOpacity
@@ -782,7 +948,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: "rgba(27, 126, 7, 0.4)",
   },
   overviewContent: {
     padding: 20,
@@ -1084,6 +1250,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     paddingVertical: 16,
   },
+  avatarContainer: {
+    position: "relative",
+    alignItems: "center",
+  },
   profileAvatarLarge: {
     width: 100,
     height: 100,
@@ -1091,6 +1261,28 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 3,
     borderColor: "#e5e7eb",
+  },
+  editAvatarButton: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    backgroundColor: "#166534",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  editAvatarIcon: {
+    fontSize: 16,
+    color: "white",
   },
   profileRole: {
     fontSize: 14,
@@ -1136,7 +1328,7 @@ const styles = StyleSheet.create({
   adminLogoutButton: {
     width: "100%",
     paddingVertical: 16,
-    backgroundColor: "#dc2626",
+    backgroundColor: "#166534",
     borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000",
@@ -1150,5 +1342,56 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  imageOptionsModal: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "#1f2937",
+  },
+  optionButton: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+    alignItems: "center",
+  },
+  optionButtonText: {
+    fontSize: 16,
+    color: "#166534",
+    fontWeight: "600",
+  },
+  removeButton: {
+    borderBottomWidth: 0,
+  },
+  removeButtonText: {
+    fontSize: 16,
+    color: "#dc2626",
+    fontWeight: "600",
+  },
+  cancelButton: {
+    marginTop: 10,
+    paddingVertical: 16,
+    backgroundColor: "#f3f4f6",
+    borderRadius: 12,
+    borderBottomWidth: 0,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    color: "#374151",
+    fontWeight: "600",
   },
 });

@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
   },
   bannerOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.overlayLight,
+    backgroundColor: "rgba(27, 126, 7, 0.4)",
   },
   bannerContent: {
     flex: 1,
