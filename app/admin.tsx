@@ -895,15 +895,6 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
               Tuesday, January 14, 2025
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.smallProfilePic}
-            onPress={() => setCurrentPage("admin-profile")}
-          >
-            <Image
-              source={getProfileImageSource()}
-              style={styles.profileImage}
-            />
-          </TouchableOpacity>
         </View>
 
         <ScrollView style={styles.adminNotificationsList}>
