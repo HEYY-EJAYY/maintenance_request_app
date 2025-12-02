@@ -1,13 +1,26 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { borderRadius, colors, shadows, spacing } from "../../config/theme";
-import { MaintenanceRequest } from "../../types";
 
-interface RequestCardProps {
-  request: MaintenanceRequest;
+interface AdminRequest {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  homeowner: string;
+  priority: string;
+  date: string;
 }
 
-export const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
+interface AdminRequestCardProps {
+  request: AdminRequest;
+  onPress?: () => void;
+}
+
+export const AdminRequestCard: React.FC<AdminRequestCardProps> = ({
+  request,
+  onPress,
+}) => {
   const getStatusStyle = () => {
     switch (request.status) {
       case "ongoing":
@@ -34,6 +47,28 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
     }
   };
 
+  const getPriorityStyle = () => {
+    switch (request.priority) {
+      case "high":
+        return styles.priorityHigh;
+      case "medium":
+        return styles.priorityMedium;
+      default:
+        return styles.priorityLow;
+    }
+  };
+
+  const getPriorityTextStyle = () => {
+    switch (request.priority) {
+      case "high":
+        return styles.priorityHighText;
+      case "medium":
+        return styles.priorityMediumText;
+      default:
+        return styles.priorityLowText;
+    }
+  };
+
   const formatStatus = (status: string) => {
     return status
       .split("-")
@@ -42,20 +77,29 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request }) => {
   };
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.header}>
         <View style={styles.info}>
           <Text style={styles.id}>{request.id}</Text>
           <Text style={styles.title}>{request.title}</Text>
           <Text style={styles.description}>{request.description}</Text>
+          <Text style={styles.homeowner}>👤 {request.homeowner}</Text>
+          <Text style={styles.date}>📅 {request.date}</Text>
         </View>
-        <View style={[styles.statusBadge, getStatusStyle()]}>
-          <Text style={[styles.statusText, getStatusTextStyle()]}>
-            {formatStatus(request.status)}
-          </Text>
+        <View style={styles.badges}>
+          <View style={[styles.statusBadge, getStatusStyle()]}>
+            <Text style={[styles.statusText, getStatusTextStyle()]}>
+              {formatStatus(request.status)}
+            </Text>
+          </View>
+          <View style={[styles.priorityBadge, getPriorityStyle()]}>
+            <Text style={[styles.priorityText, getPriorityTextStyle()]}>
+              {request.priority.toUpperCase()}
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -79,19 +123,33 @@ const styles = StyleSheet.create({
   id: {
     fontSize: 12,
     fontWeight: "bold",
-    color: colors.text.primary,
+    color: colors.accent,
     marginBottom: 4,
   },
   title: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "700",
     color: colors.text.primary,
     marginBottom: 4,
   },
   description: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.text.secondary,
     lineHeight: 18,
+    marginBottom: 8,
+  },
+  homeowner: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginBottom: 4,
+  },
+  date: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+  },
+  badges: {
+    gap: spacing.xs,
+    alignItems: "flex-end",
   },
   statusBadge: {
     paddingVertical: 6,
@@ -100,6 +158,15 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
+    fontWeight: "bold",
+  },
+  priorityBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: spacing.sm,
+    borderRadius: borderRadius.sm,
+  },
+  priorityText: {
+    fontSize: 10,
     fontWeight: "bold",
   },
   statusOngoing: {
@@ -125,5 +192,23 @@ const styles = StyleSheet.create({
   },
   statusPendingText: {
     color: colors.status.pending.text,
+  },
+  priorityHigh: {
+    backgroundColor: "#fee2e2",
+  },
+  priorityHighText: {
+    color: "#991b1b",
+  },
+  priorityMedium: {
+    backgroundColor: "#fef3c7",
+  },
+  priorityMediumText: {
+    color: "#92400e",
+  },
+  priorityLow: {
+    backgroundColor: "#dbeafe",
+  },
+  priorityLowText: {
+    color: "#1e40af",
   },
 });

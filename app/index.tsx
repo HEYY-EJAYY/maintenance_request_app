@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { LoginForm } from "../components/auth/LoginForm";
-import { SignUpForm } from "../components/auth/SignUpForm";
-import { SplashScreen } from "../components/auth/SplashScreen";
-import { UserRole } from "../types";
-import { AdminApp } from "./admin";
-import { HomeownerApp } from "./homeowner";
+import { LoginForm } from "../src/components/auth/LoginForm";
+import { SignUpForm } from "../src/components/auth/SignUpForm";
+import { SplashScreen } from "../src/components/auth/SplashScreen";
+import { AdminApp } from "../src/screens/admin/AdminScreen";
+import { HomeownerApp } from "../src/screens/homeowner/HomeownerScreen";
+import { UserRole } from "../src/types";
 
 type PageType = "splash" | "login" | "signup" | "homeowner-app" | "admin-app";
 

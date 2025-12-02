@@ -811,6 +811,26 @@ const styles = StyleSheet.create({
     color: "#374151",
     fontWeight: "600",
   },
+  // Image Options Modal Styles
+  imageOptionsOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  imageOptionsContainer: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  imageOptionsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1f2937",
+    marginBottom: 20,
+    textAlign: "center",
+  },
 });
 
 export default styles;
