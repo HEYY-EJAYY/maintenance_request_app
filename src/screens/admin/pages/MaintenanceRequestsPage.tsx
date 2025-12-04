@@ -91,6 +91,7 @@ export const MaintenanceRequestsPage: React.FC<
           <View style={styles.tableHeader}>
             <Text style={styles.tableHeaderCell}>Request ID</Text>
             <Text style={styles.tableHeaderCellType}>Type</Text>
+            <Text style={styles.tableHeaderCell}>Address</Text>
             <Text style={styles.tableHeaderCell}>Status</Text>
             <Text style={styles.tableHeaderCell}>Priority</Text>
           </View>
@@ -108,6 +109,9 @@ export const MaintenanceRequestsPage: React.FC<
                 </View>
                 <View style={styles.tableCell}>
                   <Text style={styles.typeText}>{request.type}</Text>
+                </View>
+                <View style={styles.tableCell}>
+                  <Text style={styles.addressText}>{request.address}</Text>
                 </View>
                 <View style={styles.tableCell}>
                   <Text

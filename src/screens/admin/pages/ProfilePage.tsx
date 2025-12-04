@@ -18,7 +18,7 @@ interface ProfilePageProps {
   onBack: () => void;
   onNavigateToTasks: () => void;
   onNavigateToHome: () => void;
-  onNavigateToAlerts: () => void;
+  onNavigateToNotifications: () => void;
   onLogout: () => void;
 }
 
@@ -29,7 +29,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onBack,
   onNavigateToTasks,
   onNavigateToHome,
-  onNavigateToAlerts,
+  onNavigateToNotifications,
   onLogout,
 }) => {
   return (
@@ -124,7 +124,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         onTabPress={(tab) => {
           if (tab === "home") onNavigateToHome();
           if (tab === "request-detail") onNavigateToTasks();
-          if (tab === "notifications") onNavigateToAlerts();
+          if (tab === "notifications") onNavigateToNotifications();
         }}
       />
     </SafeAreaView>

@@ -48,6 +48,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       type: "Plumbing",
       status: "pending",
       unit: "Unit 12A",
+      address: "Block A, Camella Homes",
       description: "Kitchen sink leaking",
       priority: "High",
       assignedTechnician: "",
@@ -61,6 +62,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       type: "Electrical",
       status: "in-progress",
       unit: "Unit 18B",
+      address: "Block B, Camella Homes",
       description: "Power outlet not working",
       priority: "Medium",
       assignedTechnician: "John Smith",
@@ -74,6 +76,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       type: "HVAC",
       status: "completed",
       unit: "Unit 05C",
+      address: "Block C, Camella Homes",
       description: "AC not cooling properly",
       priority: "High",
       assignedTechnician: "Mike Johnson",
@@ -87,6 +90,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       type: "Plumbing",
       status: "completed",
       unit: "Unit 22D",
+      address: "Block D, Camella Homes",
       description: "Toilet flush not working",
       priority: "Medium",
       assignedTechnician: "Sarah Lee",
@@ -100,6 +104,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       type: "Electrical",
       status: "pending",
       unit: "Unit 09A",
+      address: "Block A, Camella Homes",
       description: "Dimmer switch malfunctioning",
       priority: "Low",
       assignedTechnician: "",
@@ -113,6 +118,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       type: "Appliance",
       status: "in-progress",
       unit: "Unit 15B",
+      address: "Block B, Camella Homes",
       description: "Water heater temperature issue",
       priority: "High",
       assignedTechnician: "John Smith",
@@ -316,7 +322,9 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             onBack={() => setCurrentPage("admin-dashboard")}
             onNavigateToTasks={() => setCurrentPage("maintenance-requests")}
             onNavigateToHome={() => setCurrentPage("admin-dashboard")}
-            onNavigateToAlerts={() => setCurrentPage("admin-notifications")}
+            onNavigateToNotifications={() =>
+              setCurrentPage("admin-notifications")
+            }
           />
         );
 
@@ -329,7 +337,9 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             onBack={() => setCurrentPage("admin-dashboard")}
             onNavigateToTasks={() => setCurrentPage("maintenance-requests")}
             onNavigateToHome={() => setCurrentPage("admin-dashboard")}
-            onNavigateToAlerts={() => setCurrentPage("admin-notifications")}
+            onNavigateToNotifications={() =>
+              setCurrentPage("admin-notifications")
+            }
             onLogout={onLogout}
           />
         );
@@ -350,7 +360,9 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             onShowInProgress={() => setShowInProgressModal(true)}
             onNavigateToTasks={() => setCurrentPage("maintenance-requests")}
             onNavigateToHome={() => setCurrentPage("admin-dashboard")}
-            onNavigateToAlerts={() => setCurrentPage("admin-notifications")}
+            onNavigateToNotifications={() =>
+              setCurrentPage("admin-notifications")
+            }
           />
         );
     }

@@ -14,14 +14,14 @@ interface NotificationsPageProps {
   onBack: () => void;
   onNavigateToTasks: () => void;
   onNavigateToHome: () => void;
-  onNavigateToAlerts: () => void;
+  onNavigateToNotifications: () => void;
 }
 
 export const NotificationsPage: React.FC<NotificationsPageProps> = ({
   onBack,
   onNavigateToTasks,
   onNavigateToHome,
-  onNavigateToAlerts,
+  onNavigateToNotifications,
 }) => {
   return (
     <SafeAreaView style={styles.dashboardContainer}>

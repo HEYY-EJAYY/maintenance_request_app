@@ -65,6 +65,13 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
               <Text style={styles.detailValue}>{request.unit}</Text>
             </View>
 
+            {request.address && (
+              <View style={styles.detailSection}>
+                <Text style={styles.detailLabel}>Address</Text>
+                <Text style={styles.detailValue}>{request.address}</Text>
+              </View>
+            )}
+
             <View style={styles.detailSection}>
               <Text style={styles.detailLabel}>Date Submitted</Text>
               <Text style={styles.detailValue}>{request.date}</Text>

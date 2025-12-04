@@ -151,6 +151,11 @@ const styles = StyleSheet.create({
     color: "#374151",
     fontWeight: "500",
   },
+  addressText: {
+    fontSize: 12,
+    color: "#6b7280",
+    fontWeight: "400",
+  },
   statusBadge2: {
     paddingHorizontal: 10,
     paddingVertical: 5,

@@ -119,6 +119,24 @@ const styles = StyleSheet.create({
     color: "#2563eb",
     fontWeight: "600",
   },
+  addressInfo: {
+    flexDirection: "row",
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    alignItems: "center",
+  },
+  addressLabel: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  addressText: {
+    fontSize: 11,
+    color: "#374151",
+    fontWeight: "500",
+    flex: 1,
+  },
   detailModal: {
     backgroundColor: "white",
     borderRadius: 12,

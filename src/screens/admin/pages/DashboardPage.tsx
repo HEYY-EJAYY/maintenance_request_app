@@ -27,7 +27,7 @@ interface DashboardPageProps {
   onShowInProgress: () => void;
   onNavigateToTasks: () => void;
   onNavigateToHome: () => void;
-  onNavigateToAlerts: () => void;
+  onNavigateToNotifications: () => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -44,7 +44,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onShowInProgress,
   onNavigateToTasks,
   onNavigateToHome,
-  onNavigateToAlerts,
+  onNavigateToNotifications,
 }) => {
   return (
     <SafeAreaView style={styles.dashboardContainer}>
@@ -292,7 +292,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         activeTab="home"
         onTabPress={(tab) => {
           if (tab === "request-detail") onNavigateToTasks();
-          if (tab === "notifications") onNavigateToAlerts();
+          if (tab === "notifications") onNavigateToNotifications();
         }}
       />
     </SafeAreaView>

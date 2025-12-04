@@ -93,6 +93,13 @@ export const RequestModal: React.FC<RequestModalProps> = ({
                 <Text style={styles.requestModalDate}>{request.date}</Text>
               </View>
 
+              {request.address && (
+                <View style={styles.addressInfo}>
+                  <Text style={styles.addressLabel}>📍 </Text>
+                  <Text style={styles.addressText}>{request.address}</Text>
+                </View>
+              )}
+
               {request.assignedTechnician && (
                 <View style={styles.technicianInfo}>
                   <Text style={styles.technicianLabel}>Assigned to: </Text>
