@@ -26,7 +26,12 @@ export const Input: React.FC<InputProps> = ({
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.input, error && styles.inputError, rightIcon && styles.inputWithIcon, style]}
+          style={[
+            styles.input,
+            error && styles.inputError,
+            rightIcon && styles.inputWithIcon,
+            style,
+          ]}
           placeholderTextColor={colors.text.tertiary}
           {...props}
         />
@@ -47,8 +52,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   inputContainer: {
-    position: 'relative',
-    width: '100%',
+    position: "relative",
+    width: "100%",
   },
   input: {
     width: "100%",
@@ -63,12 +68,12 @@ const styles = StyleSheet.create({
     paddingRight: 45,
   },
   rightIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 12,
     top: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   inputError: {
     borderColor: "#ef4444",

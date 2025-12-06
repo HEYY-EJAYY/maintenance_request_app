@@ -140,8 +140,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
               rightIcon={
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Text style={styles.eyeIcon}>{showPassword ? "👁️" : "👁️‍🗨️"}</Text>
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                  </Text>
                 </TouchableOpacity>
               }
             />
