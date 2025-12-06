@@ -49,6 +49,31 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     }
   }, [messages]);
 
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diff < 0) return "Just now";
+    if (diff < 60) return "Just now";
+    if (diff < 3600) {
+      const minutes = Math.floor(diff / 60);
+      return `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+    }
+    if (diff < 86400) {
+      const hours = Math.floor(diff / 3600);
+      return `${hours} ${hours === 1 ? 'hr' : 'hrs'} ago`;
+    }
+    // For older messages, show date and time
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
     <>
       {/* Header */}
@@ -125,7 +150,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   </View>
                   {message.timestamp && (
                     <Text style={styles.messageTimestamp}>
-                      {message.timestamp}
+                      {formatTime(message.timestamp)}
                     </Text>
                   )}
                 </View>
