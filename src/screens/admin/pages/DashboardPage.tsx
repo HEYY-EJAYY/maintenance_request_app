@@ -126,7 +126,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       <View style={styles.adminHeader}>
         <View style={styles.adminHeaderText}>
           <Text style={styles.welcomeBack}>Welcome back,</Text>
-          <Text style={styles.adminName}>{currentUser?.name || "Admin"}!</Text>
+          <Text style={styles.adminName}>Admin {currentUser?.name}!</Text>
           <Text style={styles.dateText}>
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",

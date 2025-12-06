@@ -92,8 +92,8 @@ export const MaintenanceRequestsPage: React.FC<
             <Text style={styles.tableHeaderCell}>Request ID</Text>
             <Text style={styles.tableHeaderCellType}>Type</Text>
             <Text style={styles.tableHeaderCell}>Address</Text>
-            <Text style={styles.tableHeaderCell}>Status</Text>
-            <Text style={styles.tableHeaderCell}>Priority</Text>
+            <Text style={styles.tableHeaderCellStatus}>Status</Text>
+            <Text style={styles.tableHeaderCellPriority}>Priority</Text>
           </View>
 
           <ScrollView style={styles.tableBody}>
@@ -107,13 +107,13 @@ export const MaintenanceRequestsPage: React.FC<
                   <Text style={styles.requestIdText}>{request.id}</Text>
                   <Text style={styles.unitText}>{request.unit}</Text>
                 </View>
-                <View style={styles.tableCell}>
+                <View style={styles.tableCellType}>
                   <Text style={styles.typeText}>{request.type}</Text>
                 </View>
-                <View style={styles.tableCell}>
+                <View style={styles.tableCellAdd}>
                   <Text style={styles.addressText}>{request.address}</Text>
                 </View>
-                <View style={styles.tableCell}>
+                <View style={styles.tableCellStatus}>
                   <Text
                     style={[
                       styles.statusBadge2,
@@ -123,7 +123,7 @@ export const MaintenanceRequestsPage: React.FC<
                     {getStatusText(request.status)}
                   </Text>
                 </View>
-                <View style={styles.tableCell}>
+                <View style={styles.tableCellPriority}>
                   <Text
                     style={[
                       styles.statusBadge2,
