@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { borderRadius, colors, shadows, spacing } from "../../config/theme";
+import { authService } from "../../services/authService";
 import { UserRole } from "../../types";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
@@ -24,9 +26,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [activeTab, setActiveTab] = useState<UserRole>("homeowner");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    onLogin(activeTab);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await authService.login(email, password);
+
+      // Verify role matches selected tab
+      if (response.user.role !== activeTab) {
+        Alert.alert(
+          "Error",
+          `This account is registered as ${response.user.role}, not ${activeTab}`
+        );
+        await authService.logout();
+        return;
+      }
+
+      onLogin(response.user.role);
+    } catch (error: any) {
+      Alert.alert("Login Failed", error.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -127,10 +154,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </View>
 
             <Button
-              title="Log In"
+              title={loading ? "Logging in..." : "Log In"}
               onPress={handleLogin}
               variant={activeTab === "admin" ? "primary" : "accent"}
               style={styles.loginButton}
+              disabled={loading}
             />
 
             <View style={styles.signupTextContainer}>

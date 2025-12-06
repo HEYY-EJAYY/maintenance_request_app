@@ -24,6 +24,43 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root route - API documentation
+app.get("/", (req, res) => {
+  res.json({
+    message: "Maintenance Request System API",
+    version: "1.0.0",
+    endpoints: {
+      auth: {
+        login: "POST /api/auth/login",
+        register: "POST /api/auth/register",
+        profile: "GET /api/auth/me",
+        updateProfile: "PUT /api/auth/profile",
+        changePassword: "PUT /api/auth/password",
+      },
+      requests: {
+        create: "POST /api/requests",
+        getAll: "GET /api/requests",
+        getById: "GET /api/requests/:id",
+        update: "PUT /api/requests/:id",
+        delete: "DELETE /api/requests/:id",
+        stats: "GET /api/requests/stats/summary",
+      },
+      messages: {
+        create: "POST /api/messages",
+        getByRequest: "GET /api/messages/request/:request_id",
+      },
+      notifications: {
+        getAll: "GET /api/notifications",
+        unreadCount: "GET /api/notifications/unread/count",
+        markAsRead: "PUT /api/notifications/:id/read",
+        markAllRead: "PUT /api/notifications/read-all",
+        delete: "DELETE /api/notifications/:id",
+      },
+    },
+    health: "GET /health",
+  });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/requests", requestRoutes);

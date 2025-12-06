@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -8,6 +9,8 @@ import {
   View,
 } from "react-native";
 import { borderRadius, colors, shadows, spacing } from "../../config/theme";
+import { authService } from "../../services/authService";
+import { UserRole } from "../../types";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
 
@@ -20,7 +23,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
   onSignUp,
   onBackToLogin,
 }) => {
-  const [activeTab, setActiveTab] = useState("homeowner");
+  const [activeTab, setActiveTab] = useState<UserRole>("homeowner");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
@@ -28,12 +31,62 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
-    if (password === confirmPassword) {
-      onSignUp();
-    } else {
-      alert("Passwords do not match!");
+  // Admin specific fields
+  const [position, setPosition] = useState("");
+  const [community, setCommunity] = useState("");
+
+  const handleSignUp = async () => {
+    // Validation
+    if (!fullName || !email || !phone || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill in all required fields");
+      return;
+    }
+
+    if (activeTab === "homeowner" && !address) {
+      Alert.alert("Error", "Address is required for homeowners");
+      return;
+    }
+
+    if (activeTab === "admin" && (!position || !community)) {
+      Alert.alert("Error", "Position and community are required for admins");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authService.register({
+        email,
+        password,
+        name: fullName,
+        role: activeTab,
+        phone,
+        address: activeTab === "homeowner" ? address : undefined,
+        position: activeTab === "admin" ? position : undefined,
+        community: activeTab === "admin" ? community : undefined,
+      });
+
+      Alert.alert("Success", "Account created successfully!", [
+        { text: "OK", onPress: onSignUp },
+      ]);
+    } catch (error: any) {
+      Alert.alert(
+        "Registration Failed",
+        error.message || "Failed to create account"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,12 +176,29 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               autoCapitalize="none"
             />
 
-            <Input
-              label="Address"
-              placeholder="Enter your address"
-              value={address}
-              onChangeText={setAddress}
-            />
+            {activeTab === "homeowner" ? (
+              <Input
+                label="Address"
+                placeholder="Enter your address"
+                value={address}
+                onChangeText={setAddress}
+              />
+            ) : (
+              <>
+                <Input
+                  label="Position"
+                  placeholder="Enter your position"
+                  value={position}
+                  onChangeText={setPosition}
+                />
+                <Input
+                  label="Community"
+                  placeholder="Enter your community"
+                  value={community}
+                  onChangeText={setCommunity}
+                />
+              </>
+            )}
 
             <Input
               label="Phone Number"
@@ -184,10 +254,11 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
             </TouchableOpacity>
 
             <Button
-              title="Sign Up"
+              title={loading ? "Creating Account..." : "Sign Up"}
               onPress={handleSignUp}
               variant={activeTab === "admin" ? "primary" : "accent"}
               style={styles.signupButton}
+              disabled={loading}
             />
 
             <View style={styles.loginTextContainer}>

@@ -1,5 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert, Modal, Text, TouchableOpacity, View } from "react-native";
 import styles from "./adminStyles";
 import { AssignTechnicianModal } from "./components/AssignTechnicianModal";
@@ -10,6 +10,9 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { MaintenanceRequestsPage } from "./pages/MaintenanceRequestsPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { requestService, MaintenanceRequest } from "../../services/requestService";
+import { authService, User } from "../../services/authService";
+import { messageService } from "../../services/messageService";
 
 type AdminPageType =
   | "admin-dashboard"
@@ -30,7 +33,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [showInProgressModal, setShowInProgressModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null);
   const [showRequestDetailModal, setShowRequestDetailModal] = useState(false);
   const [showAssignTechnicianModal, setShowAssignTechnicianModal] =
     useState(false);
@@ -40,64 +43,31 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
     useState(false);
   const [completionNotes, setCompletionNotes] = useState("");
 
-  // Mock data for requests with initial state
-  const [allRequests, setAllRequests] = useState([
-    {
-      id: "REQ-2025-0012",
-      date: "2025-10-25",
-      type: "Plumbing",
-      status: "pending",
-      unit: "Unit 12A",
-      address: "Block A, Camella Homes",
-      description: "Kitchen sink leaking",
-      priority: "High",
-      assignedTechnician: "",
-      technicianNotes: "",
-      completionNotes: "",
-      completedDate: "",
-      messages: [],
-    },
-    {
-      id: "REQ-2025-0033",
-      date: "2025-10-26",
-      type: "Electrical",
-      status: "in-progress",
-      unit: "Unit 18B",
-      address: "Block B, Camella Homes",
-      description: "Power outlet not working",
-      priority: "Medium",
-      assignedTechnician: "John Smith",
-      technicianNotes: "Checking wiring connections",
-      completionNotes: "",
-      completedDate: "",
-      messages: [
-        {
-          sender: "homeowner",
-          text: "When will the technician arrive?",
-          timestamp: "10:30 AM",
-        },
-        {
-          sender: "admin",
-          text: "The technician is scheduled to arrive today at 2:00 PM.",
-          timestamp: "10:35 AM",
-        },
-      ],
-    },
-    {
-      id: "REQ-2025-0025",
-      date: "2025-10-27",
-      type: "HVAC",
-      status: "completed",
-      unit: "Unit 05C",
-      address: "Block C, Camella Homes",
-      description: "AC not cooling properly",
-      priority: "High",
-      assignedTechnician: "Mike Johnson",
-      technicianNotes: "Refrigerant refill needed",
-      completionNotes: "Refilled refrigerant and cleaned filters",
-      completedDate: "2025-10-28",
-      messages: [],
-    },
+  // State for data from backend
+  const [allRequests, setAllRequests] = useState<MaintenanceRequest[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch user data and requests on mount
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [user, requests] = await Promise.all([
+        authService.getCurrentUser(),
+        requestService.getAll(),
+      ]);
+      setCurrentUser(user);
+      setAllRequests(requests);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
     {
       id: "REQ-2025-0018",
       date: "2025-10-24",
@@ -246,12 +216,12 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
   };
 
   // Request handlers
-  const handleRequestClick = (request: any) => {
+  const handleRequestClick = (request: MaintenanceRequest) => {
     setSelectedRequest(request);
     setShowRequestDetailModal(true);
   };
 
-  const handleAssignTechnician = () => {
+  const handleAssignTechnician = async () => {
     if (!selectedRequest) return;
 
     if (!technicianName.trim()) {
@@ -259,30 +229,32 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       return;
     }
 
-    const updatedRequests = allRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? {
-            ...req,
-            status: "in-progress",
-            assignedTechnician: technicianName,
-            technicianNotes: technicianNotes,
-          }
-        : req
-    );
+    try {
+      const updatedRequest = await requestService.update(selectedRequest.id, {
+        status: "in-progress",
+        assigned_technician: technicianName,
+        technician_notes: technicianNotes,
+      });
 
-    setAllRequests(updatedRequests);
-    setShowAssignTechnicianModal(false);
-    setShowRequestDetailModal(false);
-    setTechnicianName("");
-    setTechnicianNotes("");
-    setSelectedRequest(null);
-    Alert.alert(
-      "Success",
-      "Technician assigned and status updated to In Progress"
-    );
+      setAllRequests(allRequests.map((req) =>
+        req.id === selectedRequest.id ? updatedRequest : req
+      ));
+
+      setShowAssignTechnicianModal(false);
+      setShowRequestDetailModal(false);
+      setTechnicianName("");
+      setTechnicianNotes("");
+      setSelectedRequest(null);
+      Alert.alert(
+        "Success",
+        "Technician assigned and status updated to In Progress"
+      );
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to assign technician");
+    }
   };
 
-  const handleCompleteRequest = () => {
+  const handleCompleteRequest = async () => {
     if (!selectedRequest) return;
 
     if (!completionNotes.trim()) {
@@ -290,63 +262,79 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
       return;
     }
 
-    const updatedRequests = allRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? {
-            ...req,
-            status: "completed",
-            completionNotes: completionNotes,
-            completedDate: new Date().toISOString().split("T")[0],
-          }
-        : req
-    );
+    try {
+      const updatedRequest = await requestService.update(selectedRequest.id, {
+        status: "completed",
+        completion_notes: completionNotes,
+        completed_date: new Date().toISOString().split("T")[0],
+      });
 
-    setAllRequests(updatedRequests);
-    setShowCompleteRequestModal(false);
-    setShowRequestDetailModal(false);
-    setCompletionNotes("");
-    setSelectedRequest(null);
-    Alert.alert("Success", "Request marked as completed");
+      setAllRequests(allRequests.map((req) =>
+        req.id === selectedRequest.id ? updatedRequest : req
+      ));
+
+      setShowCompleteRequestModal(false);
+      setShowRequestDetailModal(false);
+      setCompletionNotes("");
+      setSelectedRequest(null);
+      Alert.alert("Success", "Request marked as completed");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to complete request");
+    }
   };
 
-  const handleSetPriority = (priority: string) => {
+  const handleSetPriority = async (priority: string) => {
     if (!selectedRequest) return;
 
-    const updatedRequests = allRequests.map((req) =>
-      req.id === selectedRequest.id ? { ...req, priority } : req
-    );
+    try {
+      const updatedRequest = await requestService.update(selectedRequest.id, {
+        priority: priority as 'High' | 'Medium' | 'Low',
+      });
 
-    setAllRequests(updatedRequests);
-    setSelectedRequest({ ...selectedRequest, priority });
+      setAllRequests(allRequests.map((req) =>
+        req.id === selectedRequest.id ? updatedRequest : req
+      ));
+
+      setSelectedRequest(updatedRequest);
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to update priority");
+    }
   };
 
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = async (message: string) => {
     if (!selectedRequest || !message.trim()) return;
 
-    const newMessage = {
-      sender: "admin",
-      text: message,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
+    try {
+      await messageService.create(selectedRequest.id, message);
 
-    const updatedRequests = allRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? {
-            ...req,
-            messages: [...(req.messages || []), newMessage],
-          }
-        : req
-    );
-
-    setAllRequests(updatedRequests);
-    setSelectedRequest({
-      ...selectedRequest,
-      messages: [...(selectedRequest.messages || []), newMessage],
-    });
+      // Reload request to get updated messages
+      const updatedRequest = await requestService.getById(selectedRequest.id);
+      setSelectedRequest(updatedRequest);
+      setAllRequests(allRequests.map((req) =>
+        req.id === selectedRequest.id ? updatedRequest : req
+      ));
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to send message");
+    }
   };
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      onLogout();
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to logout");
+    }
+  };
+
+  // Computed states
+  const pendingRequests = allRequests.filter((req) => req.status === "pending");
+  const inProgressRequests = allRequests.filter(
+    (req) => req.status === "in-progress"
+  );
+  const completedRequests = allRequests.filter(
+    (req) => req.status === "completed"
+  );
 
   // Render appropriate page based on currentPage state
   const renderPage = () => {
@@ -396,7 +384,9 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             onNavigateToNotifications={() =>
               setCurrentPage("admin-notifications")
             }
-            onLogout={onLogout}
+            onLogout={handleLogout}
+            onUpdateProfile={loadData}
+            currentUser={currentUser}
           />
         );
 

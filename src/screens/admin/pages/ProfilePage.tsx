@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   ScrollView,
   StatusBar,
@@ -10,10 +11,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BottomNavigation } from "../../../components/common/BottomNavigation";
+import { authService, User } from "../../../services/authService";
 import styles from "./profileStyles";
 
 interface ProfilePageProps {
   profileImage: string | null;
+  currentUser: User | null;
   getProfileImageSource: () => any;
   onImagePress: () => void;
   onBack: () => void;
@@ -21,10 +24,12 @@ interface ProfilePageProps {
   onNavigateToHome: () => void;
   onNavigateToNotifications: () => void;
   onLogout: () => void;
+  onUpdateProfile: () => void;
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   profileImage,
+  currentUser,
   getProfileImageSource,
   onImagePress,
   onBack,
@@ -32,24 +37,53 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onNavigateToHome,
   onNavigateToNotifications,
   onLogout,
+  onUpdateProfile,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("Rica Garcia");
-  const [email, setEmail] = useState("admin.rica@camella.com");
-  const [position, setPosition] = useState("Community Manager");
-  const [phone, setPhone] = useState("+63 912 345 6789");
-  const [community, setCommunity] = useState("Camella Communities");
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [position, setPosition] = useState("");
+  const [phone, setPhone] = useState("");
+  const [community, setCommunity] = useState("");
 
-  const handleSave = () => {
-    setIsEditing(false);
+  useEffect(() => {
+    if (currentUser) {
+      setName(currentUser.name || "");
+      setEmail(currentUser.email || "");
+      setPosition(currentUser.position || "");
+      setPhone(currentUser.phone || "");
+      setCommunity(currentUser.community || "");
+    }
+  }, [currentUser]);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await authService.updateProfile({
+        name,
+        phone,
+        position,
+        community,
+      });
+      setIsEditing(false);
+      onUpdateProfile();
+      Alert.alert("Success", "Profile updated successfully");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
-    setName("Rica Garcia");
-    setEmail("admin.rica@camella.com");
-    setPosition("Community Manager");
-    setPhone("+63 912 345 6789");
-    setCommunity("Camella Communities");
+    if (currentUser) {
+      setName(currentUser.name || "");
+      setEmail(currentUser.email || "");
+      setPosition(currentUser.position || "");
+      setPhone(currentUser.phone || "");
+      setCommunity(currentUser.community || "");
+    }
     setIsEditing(false);
   };
   return (
@@ -189,8 +223,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </View>
 
           {isEditing && (
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save Changes</Text>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSave}
+              disabled={loading}
+            >
+              <Text style={styles.saveButtonText}>
+                {loading ? "Saving..." : "Save Changes"}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
