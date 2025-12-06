@@ -70,7 +70,9 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
     if (diff < 60) return "Just now";
     if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
-    return `${Math.floor(diff / 86400)} day${Math.floor(diff / 86400) > 1 ? "s" : ""} ago`;
+    return `${Math.floor(diff / 86400)} day${
+      Math.floor(diff / 86400) > 1 ? "s" : ""
+    } ago`;
   };
 
   return (
@@ -100,7 +102,9 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({
       >
         {loading ? (
           <View style={styles.adminNotificationCard}>
-            <Text style={styles.adminNotificationText}>Loading notifications...</Text>
+            <Text style={styles.adminNotificationText}>
+              Loading notifications...
+            </Text>
           </View>
         ) : notifications.length === 0 ? (
           <View style={styles.adminNotificationCard}>

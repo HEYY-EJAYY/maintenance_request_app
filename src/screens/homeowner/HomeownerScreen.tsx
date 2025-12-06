@@ -337,13 +337,16 @@ export const HomeownerApp: React.FC<HomeownerAppProps> = ({ onLogout }) => {
       case "request-detail":
         return (
           <RequestDetailPage
-            selectedRequestType={selectedRequestType}
-            unitNumber={unitNumber}
-            description={description}
+            request={selectedRequest}
             onBack={() => setCurrentPage("dashboard")}
             onNavigateToSubmitRequest={() => setCurrentPage("submit-request")}
             onNavigateToNotifications={() => setCurrentPage("notifications")}
-            onNavigateToChat={() => setCurrentPage("chat")}
+            onNavigateToChat={() => {
+              if (selectedRequest) {
+                loadMessages(selectedRequest.id);
+              }
+              setCurrentPage("chat");
+            }}
           />
         );
 
