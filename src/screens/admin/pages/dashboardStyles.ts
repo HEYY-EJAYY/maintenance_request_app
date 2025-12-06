@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   statCard: {
+    height: 120,
     width: "48%",
     padding: 16,
     borderRadius: 12,
@@ -107,6 +108,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1f2937",
     marginBottom: 4,
+  },
+  statTotal: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#1f2937",
+    marginTop: 7,
+    marginBottom: 4,
+    marginLeft: 26,
   },
   statLabel: {
     fontSize: 13,

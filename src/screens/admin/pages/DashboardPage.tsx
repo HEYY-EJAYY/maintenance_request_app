@@ -25,6 +25,9 @@ interface DashboardPageProps {
   pendingRequests: any[];
   completedRequests: any[];
   inProgressRequests: any[];
+  activeTechnicians: number;
+  completedThisWeek: number;
+  avgResponseTime: number;
   getProfileImageSource: () => any;
   onProfilePress: () => void;
   onShowAllRequests: () => void;
@@ -46,6 +49,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   pendingRequests,
   completedRequests,
   inProgressRequests,
+  activeTechnicians,
+  completedThisWeek,
+  avgResponseTime,
   getProfileImageSource,
   onProfilePress,
   onShowAllRequests,
@@ -56,11 +62,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onNavigateToHome,
   onNavigateToNotifications,
 }) => {
+  const dateRanges = [1, 3, 7, 30];
+
   const getDateRangeText = () => {
     if (selectedDateRange === 1) return "Today";
     if (selectedDateRange === 7) return "Last 7 days";
     if (selectedDateRange === 30) return "Last 30 days";
     return `Last ${selectedDateRange} days`;
+  };
+
+  const handleNextDateRange = () => {
+    const currentIndex = dateRanges.indexOf(selectedDateRange);
+    const nextIndex = (currentIndex + 1) % dateRanges.length;
+    onDateRangeChange(dateRanges[nextIndex]);
   };
   return (
     <SafeAreaView style={styles.dashboardContainer}>
@@ -105,57 +119,49 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
               {/* Stats Grid - 4 cards in 2x2 layout */}
               <View style={styles.statsGrid}>
-                <View
-                  style={[styles.statCard, { backgroundColor: "#93c5fd" }]}
-                >
+                <View style={[styles.statCard, { backgroundColor: "#93c5fd" }]}>
                   <TouchableOpacity onPress={onShowAllRequests}>
-                    <Text style={styles.statNumber}>{recentRequests.length}</Text>
+                    <Text style={styles.statTotal}>
+                      {recentRequests.length}
+                    </Text>
                     <Text style={styles.statLabel}>Total Requests</Text>
                   </TouchableOpacity>
-                  <View style={{ flexDirection: "row", gap: 4, marginTop: 4, flexWrap: "wrap" }}>
-                    <TouchableOpacity
-                      onPress={() => onDateRangeChange(1)}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginTop: 4,
+                    }}
+                  >
+                    <Text
                       style={{
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
-                        borderRadius: 8,
-                        backgroundColor: selectedDateRange === 1 ? "#1e3a8a" : "transparent",
+                        fontSize: 10,
+                        color: "#6b7280",
+                        fontWeight: "500",
                       }}
                     >
-                      <Text style={{ fontSize: 9, color: selectedDateRange === 1 ? "#fff" : "#1e3a8a" }}>1d</Text>
-                    </TouchableOpacity>
+                      {getDateRangeText()}
+                    </Text>
                     <TouchableOpacity
-                      onPress={() => onDateRangeChange(3)}
+                      onPress={handleNextDateRange}
                       style={{
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
-                        borderRadius: 8,
-                        backgroundColor: selectedDateRange === 3 ? "#1e3a8a" : "transparent",
+                        width: 20,
+                        height: 20,
+                        borderRadius: 10,
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
-                      <Text style={{ fontSize: 9, color: selectedDateRange === 3 ? "#fff" : "#1e3a8a" }}>3d</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => onDateRangeChange(7)}
-                      style={{
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
-                        borderRadius: 8,
-                        backgroundColor: selectedDateRange === 7 ? "#1e3a8a" : "transparent",
-                      }}
-                    >
-                      <Text style={{ fontSize: 9, color: selectedDateRange === 7 ? "#fff" : "#1e3a8a" }}>7d</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => onDateRangeChange(30)}
-                      style={{
-                        paddingHorizontal: 6,
-                        paddingVertical: 2,
-                        borderRadius: 8,
-                        backgroundColor: selectedDateRange === 30 ? "#1e3a8a" : "transparent",
-                      }}
-                    >
-                      <Text style={{ fontSize: 9, color: selectedDateRange === 30 ? "#fff" : "#1e3a8a" }}>30d</Text>
+                      <Text
+                        style={{
+                          fontSize: 19,
+                          color: "#6b7280",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        ›
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -331,19 +337,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <View style={styles.performanceGrid}>
             <View style={styles.performanceCard}>
               <Text style={styles.performanceIcon}>⏱️</Text>
-              <Text style={styles.performanceValue}>2-3hrs</Text>
+              <Text style={styles.performanceValue}>
+                {avgResponseTime > 0 ? `${avgResponseTime}hrs` : "N/A"}
+              </Text>
               <Text style={styles.performanceLabel}>Average Response Time</Text>
             </View>
             <View style={styles.performanceCard}>
               <Text style={styles.performanceIcon}>📋</Text>
-              <Text style={styles.performanceValue}>10</Text>
+              <Text style={styles.performanceValue}>{completedThisWeek}</Text>
               <Text style={styles.performanceLabel}>
                 Tasks completed this week
               </Text>
             </View>
             <View style={styles.performanceCard}>
               <Text style={styles.performanceIcon}>👷</Text>
-              <Text style={styles.performanceValue}>5</Text>
+              <Text style={styles.performanceValue}>{activeTechnicians}</Text>
               <Text style={styles.performanceLabel}>Technician Active</Text>
             </View>
           </View>

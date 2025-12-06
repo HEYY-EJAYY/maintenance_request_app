@@ -116,6 +116,37 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
     return requestDate >= daysAgo;
   });
 
+  // Calculate performance metrics
+  const activeTechnicians = new Set(
+    inProgressRequests
+      .filter((req) => req.technician_id)
+      .map((req) => req.technician_id)
+  ).size;
+
+  const completedThisWeek = allRequests.filter((req) => {
+    if (req.status !== "completed") return false;
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return new Date(req.updated_at || req.created_at) >= weekAgo;
+  }).length;
+
+  // Calculate average response time (time from created to in-progress)
+  const responseTimes = allRequests
+    .filter((req) => req.status === "in-progress" || req.status === "completed")
+    .map((req) => {
+      const created = new Date(req.created_at).getTime();
+      const updated = new Date(req.updated_at || req.created_at).getTime();
+      return (updated - created) / (1000 * 60 * 60); // Convert to hours
+    })
+    .filter((time) => time > 0 && time < 168); // Filter valid times (< 1 week)
+
+  const avgResponseTime =
+    responseTimes.length > 0
+      ? Math.round(
+          responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+        )
+      : 0;
+
   // Helper functions
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -440,6 +471,9 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             pendingRequests={pendingRequests}
             inProgressRequests={inProgressRequests}
             completedRequests={completedRequests}
+            activeTechnicians={activeTechnicians}
+            completedThisWeek={completedThisWeek}
+            avgResponseTime={avgResponseTime}
             profileImage={profileImage}
             currentUser={currentUser}
             getProfileImageSource={getProfileImageSource}
