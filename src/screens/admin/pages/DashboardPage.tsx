@@ -376,20 +376,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                           r="4"
                           fill="#22c55e"
                           stroke="#fff"
-                          strokeWidth="2"
+                          strokeWidth="0"
                         />
-                        {circle.value > 0 && (
-                          <SvgText
-                            x={circle.x}
-                            y={circle.y - 10}
-                            fontSize="10"
-                            fill="#22c55e"
-                            fontWeight="bold"
-                            textAnchor="middle"
-                          >
-                            {circle.value}
-                          </SvgText>
-                        )}
                       </React.Fragment>
                     ))}
 
@@ -402,20 +390,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                           r="4"
                           fill="#f59e0b"
                           stroke="#fff"
-                          strokeWidth="2"
+                          strokeWidth="0"
                         />
-                        {circle.value > 0 && (
-                          <SvgText
-                            x={circle.x}
-                            y={circle.y - 10}
-                            fontSize="10"
-                            fill="#f59e0b"
-                            fontWeight="bold"
-                            textAnchor="middle"
-                          >
-                            {circle.value}
-                          </SvgText>
-                        )}
                       </React.Fragment>
                     ))}
 
