@@ -383,7 +383,7 @@ export const HomeownerApp: React.FC<HomeownerAppProps> = ({ onLogout }) => {
       case "technical-issue":
         return (
           <TechnicalIssuePage
-            selectedRequestType={selectedRequestType}
+            request={selectedRequest}
             onBack={() => setCurrentPage("chat")}
             onNavigateToDashboard={() => setCurrentPage("dashboard")}
             onNavigateToSubmitRequest={() => setCurrentPage("submit-request")}

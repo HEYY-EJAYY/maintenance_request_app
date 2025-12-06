@@ -86,6 +86,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.secondary,
   },
+  notesSection: {
+    backgroundColor: "#f9fafb",
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  notesLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+  },
+  notesText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    lineHeight: 20,
+  },
   doneButton: {
     marginTop: spacing.md,
   },

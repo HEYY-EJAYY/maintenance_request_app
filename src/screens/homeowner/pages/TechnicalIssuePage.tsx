@@ -5,7 +5,7 @@ import { Button } from "../../../components/common/Button";
 import styles from "./technicalIssueStyles";
 
 interface TechnicalIssuePageProps {
-  selectedRequestType: string;
+  request: any | null;
   onBack: () => void;
   onNavigateToDashboard: () => void;
   onNavigateToSubmitRequest: () => void;
@@ -13,12 +13,62 @@ interface TechnicalIssuePageProps {
 }
 
 export const TechnicalIssuePage: React.FC<TechnicalIssuePageProps> = ({
-  selectedRequestType,
+  request,
   onBack,
   onNavigateToDashboard,
   onNavigateToSubmitRequest,
   onNavigateToNotifications,
 }) => {
+  const getStatusMessage = () => {
+    if (!request) return "No request information available.";
+
+    switch (request.status) {
+      case "completed":
+        return `The ${
+          request.type?.toLowerCase() || "maintenance"
+        } issue has been resolved.`;
+      case "in-progress":
+        return `Your ${
+          request.type?.toLowerCase() || "maintenance"
+        } request is currently being handled.`;
+      case "pending":
+        return `Your ${
+          request.type?.toLowerCase() || "maintenance"
+        } request has been received and is awaiting assignment.`;
+      default:
+        return "Request status update.";
+    }
+  };
+
+  const getUpdateLabel = () => {
+    if (!request) return "UPDATE";
+
+    switch (request.status) {
+      case "completed":
+        return "COMPLETED";
+      case "in-progress":
+        return "IN PROGRESS";
+      case "pending":
+        return "PENDING";
+      default:
+        return "UPDATE";
+    }
+  };
+
+  const getUpdateLabelStyle = () => {
+    if (!request) return styles.updateLabel;
+
+    switch (request.status) {
+      case "completed":
+        return [styles.updateLabel, { backgroundColor: "#86efac" }];
+      case "in-progress":
+        return [styles.updateLabel, { backgroundColor: "#93c5fd" }];
+      case "pending":
+        return [styles.updateLabel, { backgroundColor: "#fbbf24" }];
+      default:
+        return styles.updateLabel;
+    }
+  };
   return (
     <>
       {/* Header */}
@@ -36,25 +86,48 @@ export const TechnicalIssuePage: React.FC<TechnicalIssuePageProps> = ({
       >
         <View style={styles.technicalContainer}>
           <View style={styles.technicalCard}>
-            <View style={styles.updateLabel}>
-              <Text style={styles.updateLabelText}>UPDATE</Text>
+            <View style={getUpdateLabelStyle()}>
+              <Text style={styles.updateLabelText}>{getUpdateLabel()}</Text>
             </View>
-            <Text style={styles.updateText}>
-              The {selectedRequestType.toLowerCase()} issue has been resolved.
-            </Text>
+            <Text style={styles.updateText}>{getStatusMessage()}</Text>
 
-            <View style={styles.technicianInfo}>
-              <Image
-                source={{
-                  uri: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jerrianne",
-                }}
-                style={styles.technicianAvatar}
-              />
-              <View style={styles.technicianDetails}>
-                <Text style={styles.technicianName}>Jerrianne Alejandria</Text>
-                <Text style={styles.technicianDate}>October 20</Text>
+            {request?.assigned_technician && (
+              <View style={styles.technicianInfo}>
+                <Image
+                  source={{
+                    uri: `https://api.dicebear.com/7.x/avataaars/svg?seed=${request.assigned_technician}`,
+                  }}
+                  style={styles.technicianAvatar}
+                />
+                <View style={styles.technicianDetails}>
+                  <Text style={styles.technicianName}>
+                    {request.assigned_technician}
+                  </Text>
+                  <Text style={styles.technicianDate}>
+                    {request.updated_at
+                      ? new Date(request.updated_at).toLocaleDateString(
+                          "en-US",
+                          { month: "long", day: "numeric" }
+                        )
+                      : "Recently"}
+                  </Text>
+                </View>
               </View>
-            </View>
+            )}
+
+            {request?.technician_notes && (
+              <View style={styles.notesSection}>
+                <Text style={styles.notesLabel}>Technician Notes:</Text>
+                <Text style={styles.notesText}>{request.technician_notes}</Text>
+              </View>
+            )}
+
+            {request?.completion_notes && request.status === "completed" && (
+              <View style={styles.notesSection}>
+                <Text style={styles.notesLabel}>Completion Notes:</Text>
+                <Text style={styles.notesText}>{request.completion_notes}</Text>
+              </View>
+            )}
 
             <Button
               title="Done"
