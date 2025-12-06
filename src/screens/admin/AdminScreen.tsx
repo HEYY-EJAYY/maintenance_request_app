@@ -119,8 +119,8 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
   // Calculate performance metrics
   const activeTechnicians = new Set(
     inProgressRequests
-      .filter((req) => req.technician_id)
-      .map((req) => req.technician_id)
+      .filter((req) => req.assigned_technician)
+      .map((req) => req.assigned_technician)
   ).size;
 
   const completedThisWeek = allRequests.filter((req) => {
@@ -146,6 +146,32 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
           responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
         )
       : 0;
+
+  // Calculate weekly chart data (last 8 days)
+  const weeklyChartData = Array.from({ length: 8 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (7 - i));
+    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const completed = allRequests.filter((req) => {
+      if (req.status !== "completed") return false;
+      const updatedDate = new Date(req.updated_at || req.created_at);
+      return updatedDate >= startOfDay && updatedDate <= endOfDay;
+    }).length;
+
+    const pending = allRequests.filter((req) => {
+      if (req.status !== "pending") return false;
+      const createdDate = new Date(req.created_at);
+      return createdDate >= startOfDay && createdDate <= endOfDay;
+    }).length;
+
+    return { day: dayName, completed, pending };
+  });
 
   // Helper functions
   const getStatusStyle = (status: string) => {
@@ -474,6 +500,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({ onLogout }) => {
             activeTechnicians={activeTechnicians}
             completedThisWeek={completedThisWeek}
             avgResponseTime={avgResponseTime}
+            weeklyChartData={weeklyChartData}
             profileImage={profileImage}
             currentUser={currentUser}
             getProfileImageSource={getProfileImageSource}

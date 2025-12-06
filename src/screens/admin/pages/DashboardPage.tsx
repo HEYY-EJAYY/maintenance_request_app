@@ -28,6 +28,7 @@ interface DashboardPageProps {
   activeTechnicians: number;
   completedThisWeek: number;
   avgResponseTime: number;
+  weeklyChartData: { day: string; completed: number; pending: number }[];
   getProfileImageSource: () => any;
   onProfilePress: () => void;
   onShowAllRequests: () => void;
@@ -52,6 +53,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   activeTechnicians,
   completedThisWeek,
   avgResponseTime,
+  weeklyChartData,
   getProfileImageSource,
   onProfilePress,
   onShowAllRequests,
@@ -76,6 +78,33 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const nextIndex = (currentIndex + 1) % dateRanges.length;
     onDateRangeChange(dateRanges[nextIndex]);
   };
+
+  // Calculate chart points from data
+  const getChartPoints = (data: number[]) => {
+    const maxValue = Math.max(
+      ...weeklyChartData.map((d) => Math.max(d.completed, d.pending)),
+      1
+    );
+    const scale = 120 / maxValue; // Max height of 120px
+
+    return data
+      .map((value, index) => {
+        const x = 40 + index * 30; // 30px spacing between points
+        const y = 140 - value * scale; // Invert Y axis
+        return `${x},${y}`;
+      })
+      .join(" ");
+  };
+
+  const completedPoints = getChartPoints(
+    weeklyChartData.map((d) => d.completed)
+  );
+  const pendingPoints = getChartPoints(weeklyChartData.map((d) => d.pending));
+  const maxValue = Math.max(
+    ...weeklyChartData.map((d) => Math.max(d.completed, d.pending)),
+    1
+  );
+  const yStep = Math.ceil(maxValue / 3);
   return (
     <SafeAreaView style={styles.dashboardContainer}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
@@ -262,18 +291,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 0
               </SvgText>
               <SvgText x="20" y="115" fontSize="10" fill="#999">
-                3
+                {yStep}
               </SvgText>
               <SvgText x="20" y="85" fontSize="10" fill="#999">
-                6
+                {yStep * 2}
               </SvgText>
               <SvgText x="20" y="55" fontSize="10" fill="#999">
-                9
+                {yStep * 3}
               </SvgText>
 
               {/* Completed line (green) */}
               <Polyline
-                points="40,120 70,100 100,85 130,70 160,80 190,65 220,55 250,45"
+                points={completedPoints}
                 fill="none"
                 stroke="#86efac"
                 strokeWidth="2"
@@ -281,37 +310,24 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
               {/* Pending line (orange) */}
               <Polyline
-                points="40,130 70,115 100,105 130,95 160,100 190,90 220,95 250,85"
+                points={pendingPoints}
                 fill="none"
                 stroke="#fbbf24"
                 strokeWidth="2"
               />
 
               {/* X-axis labels */}
-              <SvgText x="35" y="160" fontSize="9" fill="#666">
-                Mon
-              </SvgText>
-              <SvgText x="65" y="160" fontSize="9" fill="#666">
-                Tue
-              </SvgText>
-              <SvgText x="95" y="160" fontSize="9" fill="#666">
-                Wed
-              </SvgText>
-              <SvgText x="125" y="160" fontSize="9" fill="#666">
-                Thu
-              </SvgText>
-              <SvgText x="160" y="160" fontSize="9" fill="#666">
-                Fri
-              </SvgText>
-              <SvgText x="190" y="160" fontSize="9" fill="#666">
-                Sat
-              </SvgText>
-              <SvgText x="215" y="160" fontSize="9" fill="#666">
-                Sun
-              </SvgText>
-              <SvgText x="245" y="160" fontSize="9" fill="#666">
-                Mon
-              </SvgText>
+              {weeklyChartData.map((item, index) => (
+                <SvgText
+                  key={index}
+                  x={35 + index * 30}
+                  y="160"
+                  fontSize="9"
+                  fill="#666"
+                >
+                  {item.day}
+                </SvgText>
+              ))}
             </Svg>
             {/* Legend */}
             <View style={styles.chartLegend}>
